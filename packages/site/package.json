@@ -26,9 +26,14 @@
   },
   "dependencies": {
     "@metamask/providers": "^9.0.0",
+    "@stablelib/blake2b": "^1.0.1",
+    "@types/bs58check": "^2.1.0",
+    "bs58check": "^2.1.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
+    "safe-buffer": "^5.2.1",
+    "stream-browserify": "^3.0.0",
     "styled-components": "5.3.3"
   },
   "devDependencies": {

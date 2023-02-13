@@ -1,5 +1,60 @@
+import { Buffer } from 'buffer';
+import * as bs58check from 'bs58check';
+import { hash } from '@stablelib/blake2b';
+
 import { defaultSnapOrigin } from '../config';
 import { GetSnapsResponse, Snap } from '../types';
+
+export async function getAddressFromPublicKey(
+  publicKey: string,
+): Promise<string> {
+  const prefixes = {
+    // tz1...
+    edpk: {
+      length: 54,
+      prefix: Buffer.from(new Uint8Array([6, 161, 159])),
+    },
+    // tz2...
+    sppk: {
+      length: 55,
+      prefix: Buffer.from(new Uint8Array([6, 161, 161])),
+    },
+    // tz3...
+    p2pk: {
+      length: 55,
+      prefix: Buffer.from(new Uint8Array([6, 161, 164])),
+    },
+  };
+
+  let prefix: Buffer | undefined;
+  let plainPublicKey: string | undefined;
+  if (publicKey.length === 64) {
+    prefix = prefixes.edpk.prefix;
+    plainPublicKey = publicKey;
+  } else {
+    const entries = Object.entries(prefixes);
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
+    for (let index = 0; index < entries.length; index++) {
+      const [key, value] = entries[index];
+      if (publicKey.startsWith(key) && publicKey.length === value.length) {
+        prefix = value.prefix;
+        const decoded = bs58check.decode(publicKey);
+        plainPublicKey = decoded
+          .slice(key.length, decoded.length)
+          .toString('hex');
+        break;
+      }
+    }
+  }
+
+  if (!prefix || !plainPublicKey) {
+    throw new Error(`invalid publicKey: ${publicKey}`);
+  }
+
+  const payload: Uint8Array = hash(Buffer.from(plainPublicKey, 'hex'), 20);
+
+  return bs58check.encode(Buffer.concat([prefix, Buffer.from(payload)]));
+}
 
 /**
  * Get the installed snaps in MetaMask.
@@ -56,20 +111,63 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
   }
 };
 
-/**
- * Invoke the "hello" method from the example snap.
- */
-
-export const sendHello = async () => {
-  await window.ethereum.request({
+export const sendGetAccount = async () => {
+  const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
-        method: 'hello',
+        method: 'tezos_getAccount',
       },
     ],
   });
+
+  console.log('tezos_getAccount', result);
+
+  const pubkey: string = (result as any)?.test?.publicKey;
+
+  const address: string = await getAddressFromPublicKey(pubkey.slice(4));
+
+  return address;
+};
+
+export const sendOperationRequest = async () => {
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'tezos_sendOperation',
+        params: {
+          payload: 'test',
+        },
+      },
+    ],
+  });
+
+  console.log('tezos_sendOperation', result);
+
+  return (result as any).signature.prefixSig;
+};
+
+export const sendSignRequest = async () => {
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'tezos_signPayload',
+        params: {
+          payload:
+            '05010000004254657a6f73205369676e6564204d6573736167653a206d79646170702e636f6d20323032312d30312d31345431353a31363a30345a2048656c6c6f20776f726c6421',
+        },
+      },
+    ],
+  });
+
+  console.log('tezos_signPayload', result);
+
+  return (result as any).signature.prefixSig;
 };
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

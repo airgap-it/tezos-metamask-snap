@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example Snap",
+  "description": "A Snap to add Tezos to MetaMask.",
+  "proposedName": "Tezos MetaMask Snap",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "naL9tJT7QHAFER/TGfTcjwUFZUMhrsWY5f8XqX28M/g=",
+    "shasum": "mUmUmMl285lCPhpjfJB+Y/srHmzPCAu15OOGe3V6640=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -18,7 +18,19 @@
     }
   },
   "initialPermissions": {
-    "snap_confirm": {}
+    "snap_confirm": {},
+    "snap_getBip32Entropy": [
+      {
+        "path": [
+          "m",
+          "44'",
+          "1729'",
+          "0'",
+          "0'"
+        ],
+        "curve": "ed25519"
+      }
+    ]
   },
   "manifestVersion": "0.1"
 }

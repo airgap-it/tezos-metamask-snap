@@ -1,10 +1,12 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
   getSnap,
-  sendHello,
+  sendGetAccount,
+  sendOperationRequest,
+  sendSignRequest,
   shouldDisplayReconnectButton,
 } from '../utils';
 import {
@@ -101,6 +103,9 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [address, setAddress] = useState('');
+  const [opResult, setOpResult] = useState('');
+  const [signResult, setSignResult] = useState('');
 
   const handleConnectClick = async () => {
     try {
@@ -119,7 +124,25 @@ const Index = () => {
 
   const handleSendHelloClick = async () => {
     try {
-      await sendHello();
+      setAddress(await sendGetAccount());
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSendOperationRequestClick = async () => {
+    try {
+      setOpResult(await sendOperationRequest());
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSendSignRequestClick = async () => {
+    try {
+      setSignResult(await sendSignRequest());
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -129,11 +152,9 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Welcome to the <Span>Tezos + MetaMask Demo</Span>
       </Heading>
-      <Subtitle>
-        Get started by editing <code>src/index.ts</code>
-      </Subtitle>
+      <Subtitle>A Snap to add Tezos support to MetaMask</Subtitle>
       <CardContainer>
         {state.error && (
           <ErrorMessage>
@@ -151,7 +172,7 @@ const Index = () => {
             fullWidth
           />
         )}
-        {!state.installedSnap && (
+        {/* {!state.installedSnap && (
           <Card
             content={{
               title: 'Connect',
@@ -166,8 +187,8 @@ const Index = () => {
             }}
             disabled={!state.isFlask}
           />
-        )}
-        {shouldDisplayReconnectButton(state.installedSnap) && (
+        )} */}
+        {/* {shouldDisplayReconnectButton(state.installedSnap) && (
           <Card
             content={{
               title: 'Reconnect',
@@ -182,12 +203,14 @@ const Index = () => {
             }}
             disabled={!state.installedSnap}
           />
-        )}
+        )} */}
         <Card
           content={{
-            title: 'Send Hello message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
+            title: 'Request Address',
+            description: 'Get the Tezos Public Key and Address from MetaMask',
+            data: {
+              address,
+            },
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
@@ -196,18 +219,47 @@ const Index = () => {
             ),
           }}
           disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
+          fullWidth={true}
+        />
+        <Card
+          content={{
+            title: 'Send Operation Request (NOT WORKING)',
+            description: 'Send an operation to MetaMask to be signed.',
+            data: {
+              payload: { destination: 'tz1...' },
+            },
+            button: (
+              <SendHelloButton
+                onClick={handleSendOperationRequestClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={true}
+        />
+        <Card
+          content={{
+            title: 'Send Sign Payload Request',
+            description: 'Send a payload to MetaMask to be signed.',
+            data: {
+              payload: '05010000004254657a6f73205...',
+              result: signResult,
+            },
+            button: (
+              <SendHelloButton
+                onClick={handleSendSignRequestClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={true}
         />
         <Notice>
           <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
+            Please note that this is an early preview and still under heavy
+            development.
           </p>
         </Notice>
       </CardContainer>

@@ -56,5 +56,13 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@airgap/tezos": "^0.13.9",
+    "@taquito/signer": "^15.1.0",
+    "@taquito/taquito": "^15.1.0",
+    "bs58check": "^2.1.2",
+    "buffer": "^6.0.3",
+    "stream-browserify": "^3.0.0"
   }
 }
