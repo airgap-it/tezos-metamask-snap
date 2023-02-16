@@ -4,8 +4,13 @@ import * as bs58check from 'bs58check';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 globalThis.Buffer = require('buffer/').Buffer;
 
-const fromHexString = (hexString: string) =>
-  Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+const fromHexString = (hexString: string): Uint8Array => {
+  const matches = hexString.match(/.{1,2}/gu);
+  if (!matches) {
+    return new Uint8Array();
+  }
+  return Uint8Array.from(matches.map((byte) => parseInt(byte, 16)));
+};
 
 type TezosSnapRpcMethods =
   | 'tezos_getAccount'
