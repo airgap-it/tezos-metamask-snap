@@ -2,6 +2,8 @@
 
 This snap adds Tezos support to MetaMask.
 
+WARNING: This is an early proof of concept and currently doesn't work because of breaking changes in MetaMask Flask. Any contributions are welcome.
+
 ## TODO:
 
 - [ ] Update to make compatible with latest MetaMask Flask version
