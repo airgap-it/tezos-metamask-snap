@@ -1,4 +1,15 @@
-# @metamask/template-snap-monorepo
+# tezos-metamask-snap
+
+This snap adds Tezos support to MetaMask.
+
+## TODO:
+
+- [ ] Update to make compatible with latest MetaMask Flask version
+- [ ] Add support for operation requests
+- [ ] Allow derivation of tz2 addresses
+- [ ] Investigate Beacon compatibility to make compatible with existing Tezos dApps
+
+# Original Readme
 
 This repository demonstrates how to develop a snap with TypeScript. For detailed instructions, see [the MetaMask documentation](https://docs.metamask.io/guide/snaps.html#serving-a-snap-to-your-local-environment).
 
