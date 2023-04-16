@@ -1,4 +1,5 @@
-import { OnRpcRequestHandler } from '@metamask/snap-types';
+import { OnRpcRequestHandler } from '@metamask/snaps-types';
+import { heading, panel, text } from '@metamask/snaps-ui';
 import { InMemorySigner } from '@taquito/signer';
 import * as bs58check from 'bs58check';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
@@ -40,19 +41,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     description: string,
     textAreaContent: string,
   ) => {
-    const result = await wallet.request({
-      method: 'snap_confirm',
-      params: [
-        {
-          prompt,
-          description,
-          textAreaContent,
-        },
-      ],
+    const result = await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'confirmation',
+        content: panel([
+          heading(prompt),
+          text(description),
+          text(textAreaContent),
+        ]),
+      },
     });
 
     if (result) {
-      const tezosNode = await wallet.request({
+      const tezosNode = await snap.request({
         method: 'snap_getBip32Entropy',
         params: {
           // Must be specified exactly in the manifest

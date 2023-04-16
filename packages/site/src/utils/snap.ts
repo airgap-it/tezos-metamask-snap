@@ -108,12 +108,12 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 export const sendGetAccount = async () => {
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
         method: 'tezos_getAccount',
       },
-    ],
+    },
   });
 
   console.log('tezos_getAccount', result);
@@ -128,15 +128,15 @@ export const sendGetAccount = async () => {
 export const sendOperationRequest = async () => {
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
         method: 'tezos_sendOperation',
         params: {
           payload: 'test',
         },
       },
-    ],
+    },
   });
 
   console.log('tezos_sendOperation', result);
@@ -147,16 +147,16 @@ export const sendOperationRequest = async () => {
 export const sendSignRequest = async () => {
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
         method: 'tezos_signPayload',
         params: {
           payload:
             '05010000004254657a6f73205369676e6564204d6573736167653a206d79646170702e636f6d20323032312d30312d31345431353a31363a30345a2048656c6c6f20776f726c6421',
         },
       },
-    ],
+    },
   });
 
   console.log('tezos_signPayload', result);
