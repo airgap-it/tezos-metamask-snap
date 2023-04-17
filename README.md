@@ -2,7 +2,7 @@
 
 This snap adds Tezos support to MetaMask.
 
-WARNING: This is an early proof of concept and currently doesn't work because of breaking changes in MetaMask Flask. Any contributions are welcome.
+WARNING: This is an early proof of concept and currently doesn't support all features (eg. signing operations, only supports signing messages). Any contributions are welcome.
 
 ## TODO:
 
