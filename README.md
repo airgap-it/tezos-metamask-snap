@@ -8,6 +8,7 @@ WARNING: This is an early proof of concept and currently doesn't work because of
 
 - [ ] Update to make compatible with latest MetaMask Flask version
 - [ ] Add support for operation requests
+- [ ] Find way to add @taquito/taquito to project
 - [ ] Allow derivation of tz2 addresses
 - [ ] Investigate Beacon compatibility to make compatible with existing Tezos dApps
 
