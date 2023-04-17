@@ -8,9 +8,9 @@ jobs:
   publish-release:
     permissions:
       contents: write
-    if: |
-      github.event.pull_request.merged == true &&
-      startsWith(github.event.pull_request.head.ref, 'release/')
+    # if: |
+    #   github.event.pull_request.merged == true &&
+    #   startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
