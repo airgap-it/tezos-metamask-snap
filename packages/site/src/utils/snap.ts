@@ -118,7 +118,7 @@ export const sendGetAccount = async () => {
 
   console.log('tezos_getAccount', result);
 
-  const pubkey: string = (result as any)?.test?.publicKey;
+  const pubkey: string = (result as any)?.result?.ed25519?.publicKey;
 
   const address: string = await getAddressFromPublicKey(pubkey.slice(4));
 
@@ -141,7 +141,7 @@ export const sendOperationRequest = async () => {
 
   console.log('tezos_sendOperation', result);
 
-  return (result as any).signature.prefixSig;
+  return (result as any).result.signature.prefixSig;
 };
 
 export const sendSignRequest = async () => {

@@ -62,14 +62,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           curve: 'ed25519',
         },
       });
-      return tezosNode;
+      return { ed25519: tezosNode };
     }
     return undefined;
   };
 
-  const sign = async (tezosNode: any) => {
-    const rawsk = tezosNode.privateKey;
-
+  const sign = async (payload: string, node: { ed25519: any }) => {
+    const rawsk = node.ed25519.privateKey;
     const prefix = new Uint8Array([13, 15, 58, 7]);
     const arrayTwo = fromHexString(rawsk.slice(2));
 
@@ -81,8 +80,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     const signer = new InMemorySigner(sk);
 
-    const bytes =
-      '05010000004254657a6f73205369676e6564204d6573736167653a206d79646170702e636f6d20323032312d30312d31345431353a31363a30345a2048656c6c6f20776f726c6421';
+    const bytes = payload;
     const signature = await signer.sign(bytes);
 
     return {
@@ -101,20 +99,22 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         `Do you want to allow ${origin} to access your Tezos public key?`,
       );
 
-      return { test: tezosNode1 };
+      return { result: tezosNode1 };
 
     case 'tezos_sendOperation':
       // eslint-disable-next-line no-case-declarations
       const tezosNode2 = await getWallet('', '', '');
 
-      return { tezosNode2 };
+      return { result: tezosNode2 };
     case 'tezos_signPayload':
+      // eslint-disable-next-line no-case-declarations
+      const { payload } = params as any;
       // eslint-disable-next-line no-case-declarations
       const tezosNode3 = await getWallet(
         'Sign Payload',
         '',
         `Do you want to sign the following payload?\n\n${JSON.stringify(
-          params,
+          payload,
           null,
           2,
         )}`,
@@ -124,7 +124,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         return '';
       }
 
-      return sign(tezosNode3);
+      return sign(payload, tezosNode3);
     default:
       throw new Error('Method not found.');
   }
