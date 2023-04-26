@@ -27,9 +27,9 @@
     "start": "mm-snap watch"
   },
   "dependencies": {
-    "@airgap/tezos": "^0.13.9",
+    "@taquito/local-forging": "^15.1.0",
     "@taquito/signer": "^15.1.0",
-    "@taquito/taquito": "^15.1.0",
+    "bignumber.js": "^9.1.1",
     "bs58check": "^2.1.2",
     "buffer": "^6.0.3",
     "stream-browserify": "^3.0.0"

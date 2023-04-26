@@ -2,6 +2,10 @@ import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { InMemorySigner } from '@taquito/signer';
 import * as bs58check from 'bs58check';
+import {
+  broadcastTransaction,
+  prepareOperations,
+} from './tezos/prepare-operations';
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 globalThis.Buffer = require('buffer/').Buffer;
 
@@ -90,6 +94,24 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     };
   };
 
+  const prepareAndSign = async (operation: any[], node: { ed25519: any }) => {
+    // TODO: I did this to get the address in a lazy way, need to replace this.
+    const x = await sign(
+      '05010000004254657a6f73205369676e6564204d6573736167653a206d79646170702e636f6d20323032312d30312d31345431353a31363a30345a2048656c6c6f20776f726c6421',
+      node,
+    );
+
+    const forged = await prepareOperations(
+      x.address,
+      node.ed25519.publicKey.slice(4),
+      operation,
+    );
+
+    const signed = await sign(forged, node);
+
+    return await broadcastTransaction(signed.signature.sbytes);
+  };
+
   switch (typedMethod) {
     case 'tezos_getAccount':
       // eslint-disable-next-line no-case-declarations
@@ -103,18 +125,32 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'tezos_sendOperation':
       // eslint-disable-next-line no-case-declarations
-      const tezosNode2 = await getWallet('', '', '');
+      const { payload } = params as any;
+      // eslint-disable-next-line no-case-declarations
+      const tezosNode2 = await getWallet(
+        'Sign Operation',
+        '',
+        `Do you want to sign the following payload?\n\n${JSON.stringify(
+          payload,
+          null,
+          2,
+        )}`,
+      );
 
-      return { result: tezosNode2 };
+      if (!tezosNode2) {
+        return '';
+      }
+
+      return prepareAndSign(payload, tezosNode2);
     case 'tezos_signPayload':
       // eslint-disable-next-line no-case-declarations
-      const { payload } = params as any;
+      const { payload: payload2 } = params as any;
       // eslint-disable-next-line no-case-declarations
       const tezosNode3 = await getWallet(
         'Sign Payload',
         '',
         `Do you want to sign the following payload?\n\n${JSON.stringify(
-          payload,
+          payload2,
           null,
           2,
         )}`,
@@ -124,7 +160,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         return '';
       }
 
-      return sign(payload, tezosNode3);
+      return sign(payload2, tezosNode3);
     default:
       throw new Error('Method not found.');
   }

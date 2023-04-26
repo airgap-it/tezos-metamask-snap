@@ -133,7 +133,13 @@ export const sendOperationRequest = async () => {
       request: {
         method: 'tezos_sendOperation',
         params: {
-          payload: 'test',
+          payload: [
+            {
+              kind: 'transaction',
+              destination: '',
+              amount: '1',
+            },
+          ],
         },
       },
     },
@@ -141,7 +147,7 @@ export const sendOperationRequest = async () => {
 
   console.log('tezos_sendOperation', result);
 
-  return (result as any).result.signature.prefixSig;
+  return (result as any).signature.prefixSig;
 };
 
 export const sendSignRequest = async () => {
