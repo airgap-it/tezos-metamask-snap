@@ -6,6 +6,7 @@ import {
   broadcastTransaction,
   prepareOperations,
 } from './tezos/prepare-operations';
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 globalThis.Buffer = require('buffer/').Buffer;
 
@@ -71,7 +72,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     return undefined;
   };
 
-  const sign = async (payload: string, node: { ed25519: any }) => {
+  const sign = async (
+    payload: string,
+    watermark: Uint8Array | undefined,
+    node: { ed25519: any },
+  ) => {
     const rawsk = node.ed25519.privateKey;
     const prefix = new Uint8Array([13, 15, 58, 7]);
     const arrayTwo = fromHexString(rawsk.slice(2));
@@ -85,7 +90,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     const signer = new InMemorySigner(sk);
 
     const bytes = payload;
-    const signature = await signer.sign(bytes);
+    const signature = await signer.sign(bytes, watermark);
 
     return {
       secretKey: sk,
@@ -98,6 +103,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     // TODO: I did this to get the address in a lazy way, need to replace this.
     const x = await sign(
       '05010000004254657a6f73205369676e6564204d6573736167653a206d79646170702e636f6d20323032312d30312d31345431353a31363a30345a2048656c6c6f20776f726c6421',
+      undefined,
       node,
     );
 
@@ -107,7 +113,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       operation,
     );
 
-    const signed = await sign(forged, node);
+    const signed = await sign(forged, new Uint8Array([3]), node);
 
     return await broadcastTransaction(signed.signature.sbytes);
   };
