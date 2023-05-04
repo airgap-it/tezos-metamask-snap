@@ -583,5 +583,5 @@ export const broadcastTransaction = async (
   });
 
   // returns hash if successful
-  return await response.text();
+  return await response.json();
 };
