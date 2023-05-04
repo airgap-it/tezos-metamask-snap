@@ -21,5 +21,5 @@ export const prepareAndSign = async (
 
   const signed = await sign(forged, operationWatermark, node);
 
-  return await broadcastTransaction(signed.signature.sbytes);
+  return broadcastTransaction(signed.signature.sbytes);
 };
