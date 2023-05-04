@@ -1,5 +1,5 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { heading, panel, text } from '@metamask/snaps-ui';
+import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { InMemorySigner } from '@taquito/signer';
 import * as bs58check from 'bs58check';
 import {
@@ -18,10 +18,147 @@ const fromHexString = (hexString: string): Uint8Array => {
   return Uint8Array.from(matches.map((byte) => parseInt(byte, 16)));
 };
 
+const getSigner = async (node: { ed25519: any }) => {
+  const rawsk = node.ed25519.privateKey;
+  const edskPrefix = new Uint8Array([13, 15, 58, 7]);
+  const arrayTwo = fromHexString(rawsk.slice(2));
+
+  const mergedArray = new Uint8Array(edskPrefix.length + arrayTwo.length);
+  mergedArray.set(edskPrefix);
+  mergedArray.set(arrayTwo, edskPrefix.length);
+
+  const sk = bs58check.encode(mergedArray);
+
+  return new InMemorySigner(sk);
+};
+
+const sign = async (
+  payload: string,
+  watermark: Uint8Array | undefined,
+  node: { ed25519: any },
+) => {
+  const signer = await getSigner(node);
+
+  const bytes = payload;
+
+  const signature = await signer.sign(bytes, watermark);
+
+  return {
+    signature,
+  };
+};
+
+const getWallet = async () => {
+  const tezosNode = await snap.request({
+    method: 'snap_getBip32Entropy',
+    params: {
+      path: ['m', "44'", "1729'", "0'", "0'"],
+      curve: 'ed25519',
+    },
+  });
+
+  return { ed25519: tezosNode };
+};
+
+const prepareAndSign = async (operation: any[], node: { ed25519: any }) => {
+  const operationWatermark = new Uint8Array([3]);
+
+  const signer = await getSigner(node);
+
+  const forged = await prepareOperations(
+    await signer.publicKeyHash(),
+    node.ed25519.publicKey.slice(4),
+    operation,
+  );
+
+  const signed = await sign(forged, operationWatermark, node);
+
+  return await broadcastTransaction(signed.signature.sbytes);
+};
+
 type TezosSnapRpcMethods =
   | 'tezos_getAccount'
   | 'tezos_sendOperation'
   | 'tezos_signPayload';
+
+const tezosGetAccounts = async (origin: string) => {
+  const wallet = await getWallet();
+  const signer = await getSigner(wallet);
+
+  const approved = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([
+        heading('Tezos Account'),
+        text(
+          `Do you want to allow ${origin} to access your Tezos public key and address?`,
+        ),
+        copyable(await signer.publicKey()),
+        divider(),
+        copyable(await signer.publicKeyHash()),
+      ]),
+    },
+  });
+
+  console.log('approved', approved);
+
+  return {
+    curve: 'ed25519',
+    publicKey: await signer.publicKey(),
+    address: await signer.publicKeyHash(),
+  };
+};
+
+const tezosSendOperation = async (params: any) => {
+  const { payload } = params as any;
+  const wallet = await getWallet();
+
+  const approved = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([
+        heading('Sign Operation'),
+        text('Do you want to sign the following payload?'),
+        copyable(JSON.stringify(payload, null, 2)),
+      ]),
+    },
+  });
+
+  console.log('approved', approved);
+
+  if (!wallet) {
+    return '';
+  }
+
+  return { opHash: await prepareAndSign(payload, wallet) };
+};
+
+const tezosSignPayload = async (params: any) => {
+  const { payload } = params as any;
+  const wallet = await getWallet();
+
+  const approved = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([
+        heading('Sign Payload'),
+        text('Do you want to sign the following payload?'),
+        copyable(JSON.stringify(payload)),
+      ]),
+    },
+  });
+
+  console.log('approved', approved);
+
+  if (!wallet) {
+    return '';
+  }
+
+  return sign(payload, undefined, wallet);
+};
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -38,135 +175,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
+  console.log(origin);
   const { method, params } = request;
   const typedMethod: TezosSnapRpcMethods = method as any;
 
-  const getWallet = async (
-    prompt: string,
-    description: string,
-    textAreaContent: string,
-  ) => {
-    const result = await snap.request({
-      method: 'snap_dialog',
-      params: {
-        type: 'confirmation',
-        content: panel([
-          heading(prompt),
-          text(description),
-          text(textAreaContent),
-        ]),
-      },
-    });
-
-    if (result) {
-      const tezosNode = await snap.request({
-        method: 'snap_getBip32Entropy',
-        params: {
-          // Must be specified exactly in the manifest
-          path: ['m', "44'", "1729'", "0'", "0'"],
-          curve: 'ed25519',
-        },
-      });
-      return { ed25519: tezosNode };
-    }
-    return undefined;
-  };
-
-  const sign = async (
-    payload: string,
-    watermark: Uint8Array | undefined,
-    node: { ed25519: any },
-  ) => {
-    const rawsk = node.ed25519.privateKey;
-    const prefix = new Uint8Array([13, 15, 58, 7]);
-    const arrayTwo = fromHexString(rawsk.slice(2));
-
-    const mergedArray = new Uint8Array(prefix.length + arrayTwo.length);
-    mergedArray.set(prefix);
-    mergedArray.set(arrayTwo, prefix.length);
-
-    const sk = bs58check.encode(mergedArray);
-
-    const signer = new InMemorySigner(sk);
-
-    const bytes = payload;
-    const signature = await signer.sign(bytes, watermark);
-
-    return {
-      secretKey: sk,
-      address: await signer.publicKeyHash(),
-      signature,
-    };
-  };
-
-  const prepareAndSign = async (operation: any[], node: { ed25519: any }) => {
-    // TODO: I did this to get the address in a lazy way, need to replace this.
-    const x = await sign(
-      '05010000004254657a6f73205369676e6564204d6573736167653a206d79646170702e636f6d20323032312d30312d31345431353a31363a30345a2048656c6c6f20776f726c6421',
-      undefined,
-      node,
-    );
-
-    const forged = await prepareOperations(
-      x.address,
-      node.ed25519.publicKey.slice(4),
-      operation,
-    );
-
-    const signed = await sign(forged, new Uint8Array([3]), node);
-
-    return await broadcastTransaction(signed.signature.sbytes);
-  };
-
   switch (typedMethod) {
     case 'tezos_getAccount':
-      // eslint-disable-next-line no-case-declarations
-      const tezosNode1 = await getWallet(
-        'Tezos Account',
-        '',
-        `Do you want to allow ${origin} to access your Tezos public key?`,
-      );
-
-      return { result: tezosNode1 };
+      return tezosGetAccounts(origin);
 
     case 'tezos_sendOperation':
-      // eslint-disable-next-line no-case-declarations
-      const { payload } = params as any;
-      // eslint-disable-next-line no-case-declarations
-      const tezosNode2 = await getWallet(
-        'Sign Operation',
-        '',
-        `Do you want to sign the following payload?\n\n${JSON.stringify(
-          payload,
-          null,
-          2,
-        )}`,
-      );
+      return tezosSendOperation(params);
 
-      if (!tezosNode2) {
-        return '';
-      }
-
-      return prepareAndSign(payload, tezosNode2);
     case 'tezos_signPayload':
-      // eslint-disable-next-line no-case-declarations
-      const { payload: payload2 } = params as any;
-      // eslint-disable-next-line no-case-declarations
-      const tezosNode3 = await getWallet(
-        'Sign Payload',
-        '',
-        `Do you want to sign the following payload?\n\n${JSON.stringify(
-          payload2,
-          null,
-          2,
-        )}`,
-      );
+      return tezosSignPayload(params);
 
-      if (!tezosNode3) {
-        return '';
-      }
-
-      return sign(payload2, tezosNode3);
     default:
       throw new Error('Method not found.');
   }

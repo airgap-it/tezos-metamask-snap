@@ -104,27 +104,30 @@ const ErrorMessage = styled.div`
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [address, setAddress] = useState('');
+  const [publicKey, setPublicKey] = useState('');
   const [opResult, setOpResult] = useState('');
   const [signResult, setSignResult] = useState('');
 
-  const handleConnectClick = async () => {
-    try {
-      await connectSnap();
-      const installedSnap = await getSnap();
+  // const handleConnectClick = async () => {
+  //   try {
+  //     await connectSnap();
+  //     const installedSnap = await getSnap();
 
-      dispatch({
-        type: MetamaskActions.SetInstalled,
-        payload: installedSnap,
-      });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
+  //     dispatch({
+  //       type: MetamaskActions.SetInstalled,
+  //       payload: installedSnap,
+  //     });
+  //   } catch (e) {
+  //     console.error(e);
+  //     dispatch({ type: MetamaskActions.SetError, payload: e });
+  //   }
+  // };
 
   const handleSendHelloClick = async () => {
     try {
-      setAddress(await sendGetAccount());
+      const account = await sendGetAccount();
+      setAddress(account.address);
+      setPublicKey(account.publicKey);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -209,6 +212,7 @@ const Index = () => {
             title: 'Request Address',
             description: 'Get the Tezos Public Key and Address from MetaMask',
             data: {
+              publicKey,
               address,
             },
             button: (
@@ -223,10 +227,15 @@ const Index = () => {
         />
         <Card
           content={{
-            title: 'Send Operation Request (NOT WORKING)',
+            title: 'Send Operation Request',
             description: 'Send an operation to MetaMask to be signed.',
             data: {
-              payload: { destination: 'tz1...' },
+              payload: {
+                kind: 'transaction',
+                destination: 'tz1...',
+                amount: '1',
+              },
+              result: opResult,
             },
             button: (
               <SendHelloButton
