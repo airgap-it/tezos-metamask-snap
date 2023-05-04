@@ -69,7 +69,7 @@ export const sendGetAccount = async () => {
   return { publicKey, address };
 };
 
-export const sendOperationRequest = async () => {
+export const sendOperationRequest = async (address: string) => {
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
@@ -80,7 +80,7 @@ export const sendOperationRequest = async () => {
           payload: [
             {
               kind: 'transaction',
-              destination: 'tz1...',
+              destination: address,
               amount: '1',
             },
           ],

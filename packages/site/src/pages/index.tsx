@@ -136,7 +136,7 @@ const Index = () => {
 
   const handleSendOperationRequestClick = async () => {
     try {
-      setOpResult(await sendOperationRequest());
+      setOpResult(await sendOperationRequest(address));
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -232,7 +232,7 @@ const Index = () => {
             data: {
               payload: {
                 kind: 'transaction',
-                destination: 'tz1...',
+                destination: address,
                 amount: '1',
               },
               result: opResult,
