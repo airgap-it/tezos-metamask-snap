@@ -6,7 +6,7 @@ import { getSigner } from './get-signer';
 import { sign } from './sign';
 
 export const prepareAndSign = async (
-  operation: any[],
+  operations: any[],
   node: { ed25519: any },
 ) => {
   const operationWatermark = new Uint8Array([3]);
@@ -15,8 +15,8 @@ export const prepareAndSign = async (
 
   const forged = await prepareOperations(
     await signer.publicKeyHash(),
-    node.ed25519.publicKey.slice(4),
-    operation,
+    await signer.publicKey(),
+    operations,
   );
 
   const signed = await sign(forged, operationWatermark, node);

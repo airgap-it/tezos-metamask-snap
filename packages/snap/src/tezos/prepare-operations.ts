@@ -1,6 +1,5 @@
 import { localForger } from '@taquito/local-forging';
 import BigNumber from 'bignumber.js';
-import * as bs58check from 'bs58check';
 
 const MAX_GAS_PER_BLOCK = 2600000;
 const GAS_LIMIT_PLACEHOLDER = '1040000';
@@ -143,12 +142,7 @@ const createRevealOperation = async (
     gas_limit: '10000', // taken from conseiljs
     storage_limit: '0', // taken from conseiljs
     counter: counter.toFixed(),
-    public_key: bs58check.encode(
-      Buffer.concat([
-        Buffer.from(new Uint8Array([13, 15, 37, 217])),
-        Buffer.from(publicKey, 'hex'),
-      ]),
-    ),
+    public_key: publicKey,
     source: address,
   };
 
@@ -582,6 +576,5 @@ export const broadcastTransaction = async (
     throw error;
   });
 
-  // returns hash if successful
   return await response.json();
 };
