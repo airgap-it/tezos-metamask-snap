@@ -18,7 +18,9 @@ export const tezosSendOperation = async (params: any) => {
     },
   });
 
-  console.log('approved', approved);
+  if (!approved) {
+    throw new Error('User rejected');
+  }
 
   if (!wallet) {
     return '';

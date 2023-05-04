@@ -22,7 +22,9 @@ export const tezosGetAccounts = async (origin: string) => {
     },
   });
 
-  console.log('approved', approved);
+  if (!approved) {
+    throw new Error('User rejected');
+  }
 
   return {
     curve: 'ed25519',
