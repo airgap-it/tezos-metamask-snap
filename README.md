@@ -17,7 +17,7 @@ Visit http://localhost:8000 to open the demo dApp to connect to MetaMask Flask.
 ## TODO:
 
 - [ ] Add Unit Tests
-- [ ] Clean up code
+- [ ] Clean up code
 - [ ] Investigate Beacon compatibility to make compatible with existing Tezos dApps
 
 # Original Readme
