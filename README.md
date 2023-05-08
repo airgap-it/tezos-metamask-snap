@@ -2,14 +2,22 @@
 
 This snap adds Tezos support to MetaMask.
 
-WARNING: This is an early proof of concept and currently doesn't support all features (eg. signing operations, only supports signing messages). Any contributions are welcome.
+WARNING: This is an early prototype. Any contributions are welcome.
+
+## Setup
+
+Make sure you have the latest version of [MetaMask Flask](https://metamask.io/flask/) installed.
+
+```shell
+yarn install && yarn start
+```
+
+Visit http://localhost:8000 to open the demo dApp to connect to MetaMask Flask.
 
 ## TODO:
 
-- [ ] Update to make compatible with latest MetaMask Flask version
-- [ ] Add support for operation requests
-- [ ] Find way to add @taquito/taquito to project
-- [ ] Allow derivation of tz2 addresses
+- [ ] Add Unit Tests
+- [ ] Clean up code
 - [ ] Investigate Beacon compatibility to make compatible with existing Tezos dApps
 
 # Original Readme
