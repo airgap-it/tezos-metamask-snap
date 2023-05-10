@@ -1,7 +1,7 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { tezosGetAccounts } from './methods/get-accounts';
-import { tezosSendOperation } from './methods/send-operation';
-import { tezosSignPayload } from './methods/sign-payload';
+import { tezosGetAccounts } from './rpc-methods/get-accounts';
+import { tezosSendOperation } from './rpc-methods/send-operation';
+import { tezosSignPayload } from './rpc-methods/sign-payload';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 globalThis.Buffer = require('buffer/').Buffer;
