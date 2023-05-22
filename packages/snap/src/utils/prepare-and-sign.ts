@@ -1,7 +1,5 @@
-import {
-  broadcastTransaction,
-  prepareOperations,
-} from '../tezos/prepare-operations';
+import { broadcastTransaction } from '../tezos/broadcast-transaction';
+import { prepareOperations } from '../tezos/prepare-operations';
 import { getSigner } from './get-signer';
 import { sign } from './sign';
 
