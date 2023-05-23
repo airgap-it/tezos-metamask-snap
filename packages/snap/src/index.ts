@@ -2,6 +2,9 @@ import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { tezosGetAccounts } from './rpc-methods/get-accounts';
 import { tezosSendOperation } from './rpc-methods/send-operation';
 import { tezosSignPayload } from './rpc-methods/sign-payload';
+import { tezosGetRpc } from './rpc-methods/get-rpc';
+import { tezosSetRpc } from './rpc-methods/set-rpc';
+import { tezosClearRpc } from './rpc-methods/clear-rpc';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 globalThis.Buffer = require('buffer/').Buffer;
@@ -9,7 +12,10 @@ globalThis.Buffer = require('buffer/').Buffer;
 type TezosSnapRpcMethods =
   | 'tezos_getAccount'
   | 'tezos_sendOperation'
-  | 'tezos_signPayload';
+  | 'tezos_signPayload'
+  | 'tezos_getRpc'
+  | 'tezos_setRpc'
+  | 'tezos_clearRpc';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -39,6 +45,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'tezos_signPayload':
       return tezosSignPayload(params);
+
+    case 'tezos_getRpc':
+      return tezosGetRpc(params);
+
+    case 'tezos_setRpc':
+      return tezosSetRpc(params);
+
+    case 'tezos_clearRpc':
+      return tezosClearRpc(params);
 
     default:
       throw new Error('Method not found.');

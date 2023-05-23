@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 
 export const getBalanceOfAddresses = async (
   addresses: string[],
+  rpcUrl: string,
   _data?: any,
 ): Promise<string> => {
   let balance: BigNumber = new BigNumber(0);
@@ -9,7 +10,7 @@ export const getBalanceOfAddresses = async (
   for (const address of addresses) {
     try {
       const data = await fetch(
-        `https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/${address}/balance`,
+        `${rpcUrl}chains/main/blocks/head/context/contracts/${address}/balance`,
       ).then((x) => x.json());
       balance = balance.plus(new BigNumber(data));
     } catch (error: any) {

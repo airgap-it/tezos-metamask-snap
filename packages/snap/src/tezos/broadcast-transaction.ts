@@ -1,16 +1,14 @@
 export const broadcastTransaction = async (
   rawTransaction: string,
+  rpcUrl: string,
 ): Promise<string> => {
   const payload: string = rawTransaction;
 
-  const response = await fetch(
-    `https://tezos-node.prod.gke.papers.tech/injection/operation?chain=main`,
-    {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(payload),
-    },
-  ).catch((error: Error) => {
+  const response = await fetch(`${rpcUrl}injection/operation?chain=main`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch((error: Error) => {
     throw error;
   });
 

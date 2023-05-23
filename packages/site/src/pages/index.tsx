@@ -2,20 +2,14 @@ import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
-  connectSnap,
-  getSnap,
+  sendClearRpc,
   sendGetAccount,
+  sendGetRpc,
   sendOperationRequest,
+  sendSetRpc,
   sendSignRequest,
-  shouldDisplayReconnectButton,
 } from '../utils';
-import {
-  ConnectButton,
-  InstallFlaskButton,
-  ReconnectButton,
-  SendHelloButton,
-  Card,
-} from '../components';
+import { InstallFlaskButton, SendHelloButton, Card } from '../components';
 
 const Container = styled.div`
   display: flex;
@@ -107,6 +101,9 @@ const Index = () => {
   const [publicKey, setPublicKey] = useState('');
   const [opResult, setOpResult] = useState('');
   const [signResult, setSignResult] = useState('');
+  const [setRpcResult, setSetRpcResult] = useState('');
+  const [getRpcResult, setGetRpcResult] = useState('');
+  const [clearRpcResult, setClearRpcResult] = useState('');
 
   // const handleConnectClick = async () => {
   //   try {
@@ -146,6 +143,33 @@ const Index = () => {
   const handleSendSignRequestClick = async () => {
     try {
       setSignResult(await sendSignRequest());
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSendGetRpcClick = async () => {
+    try {
+      setGetRpcResult(await sendGetRpc());
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSendSetRpcClick = async () => {
+    try {
+      setSetRpcResult(await sendSetRpc());
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSendClearRpcClick = async () => {
+    try {
+      setClearRpcResult(await sendClearRpc());
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -258,6 +282,59 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleSendSignRequestClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={true}
+        />
+        <Card
+          content={{
+            title: 'Get RPC',
+            description: 'Get the RPC that MetaMask is currently using',
+            data: {
+              result: getRpcResult,
+            },
+            button: (
+              <SendHelloButton
+                onClick={handleSendGetRpcClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={true}
+        />
+        <Card
+          content={{
+            title: 'Set RPC',
+            description: 'Set the RPC to another value',
+            data: {
+              network: 'mainnet',
+              result: setRpcResult,
+            },
+            button: (
+              <SendHelloButton
+                onClick={handleSendSetRpcClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={true}
+        />
+        <Card
+          content={{
+            title: 'Clear RPC',
+            description:
+              'Clear the RPC that MetaMask is currently using and use the default again',
+            data: {
+              result: clearRpcResult,
+            },
+            button: (
+              <SendHelloButton
+                onClick={handleSendClearRpcClick}
                 disabled={!state.installedSnap}
               />
             ),

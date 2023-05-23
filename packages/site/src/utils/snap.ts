@@ -114,4 +114,56 @@ export const sendSignRequest = async () => {
   return (result as any).signature.prefixSig;
 };
 
+export const sendGetRpc = async () => {
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'tezos_getRpc',
+      },
+    },
+  });
+
+  console.log('tezos_getRpc', result);
+
+  return result as any;
+};
+
+export const sendSetRpc = async () => {
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'tezos_setRpc',
+        params: {
+          network: 'mainnet', // "mainnet" | "ghostnet"
+          rpcUrl: 'https://mainnet.api.tez.ie',
+        },
+      },
+    },
+  });
+
+  console.log('tezos_setRpc', result);
+
+  return result as any;
+};
+
+export const sendClearRpc = async () => {
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'tezos_clearRpc',
+      },
+    },
+  });
+
+  console.log('tezos_clearRpc', result);
+
+  return result as any;
+};
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

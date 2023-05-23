@@ -21,6 +21,7 @@ export const prepareOperations = async (
   address: string,
   publicKey: string,
   operationRequests: TezosOperation[],
+  rpcUrl: string,
   overrideParameters = true,
 ): Promise<string> => {
   let counter: BigNumber = new BigNumber(1);
@@ -30,13 +31,11 @@ export const prepareOperations = async (
     (
       await Promise.all([
         fetch(
-          `https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/${address}/counter`,
+          `${rpcUrl}chains/main/blocks/head/context/contracts/${address}/counter`,
         ),
+        fetch(`${rpcUrl}chains/main/blocks/head~2/hash`),
         fetch(
-          `https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head~2/hash`,
-        ),
-        fetch(
-          `https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/${address}/manager_key`,
+          `${rpcUrl}chains/main/blocks/head/context/contracts/${address}/manager_key`,
         ),
       ]).catch((error) => {
         throw new Error(error);
@@ -78,7 +77,7 @@ export const prepareOperations = async (
       let receivingBalance: BigNumber | undefined;
       if (recipient?.toLowerCase().startsWith('tz')) {
         receivingBalance = new BigNumber(
-          await getBalanceOfAddresses([recipient]),
+          await getBalanceOfAddresses([recipient], rpcUrl),
         );
       }
 
@@ -207,6 +206,7 @@ export const prepareOperations = async (
 
   const estimated = await estimateAndReplaceLimitsAndFee(
     wrappedOperation,
+    rpcUrl,
     overrideParameters,
   );
 

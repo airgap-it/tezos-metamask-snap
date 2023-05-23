@@ -24,6 +24,7 @@ import {
 
 export const estimateAndReplaceLimitsAndFee = async (
   tezosWrappedOperation: TezosWrappedOperation,
+  rpcUrl: string,
   overrideParameters = true,
   startingCounter?: BigNumber,
 ): Promise<TezosWrappedOperation> => {
@@ -59,7 +60,7 @@ export const estimateAndReplaceLimitsAndFee = async (
   });
 
   const block: { chain_id: string } = await fetch(
-    `https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head`,
+    `${rpcUrl}chains/main/blocks/head`,
   ).then((x) => x.json());
   const body = {
     chain_id: block.chain_id,
@@ -75,7 +76,7 @@ export const estimateAndReplaceLimitsAndFee = async (
   let gasLimitTotal = 0;
 
   const response: RunOperationResponse = await fetch(
-    `https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/helpers/scripts/run_operation`,
+    `${rpcUrl}chains/main/blocks/head/helpers/scripts/run_operation`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,10 +87,6 @@ export const estimateAndReplaceLimitsAndFee = async (
     .catch((runOperationError: Error) => {
       throw runOperationError;
     });
-
-  //   if (Math.random() > 0) {
-  //     throw new Error(`Test ${JSON.stringify(response)}`);
-  //   }
 
   if (tezosWrappedOperation.contents.length !== response.contents.length) {
     throw new Error(

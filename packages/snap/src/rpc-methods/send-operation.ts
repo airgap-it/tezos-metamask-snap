@@ -1,10 +1,12 @@
-import { panel, heading, text, copyable } from '@metamask/snaps-ui';
+import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getWallet } from '../utils/get-wallet';
 import { prepareAndSign } from '../utils/prepare-and-sign';
+import { getRpc } from '../utils/get-rpc';
 
 export const tezosSendOperation = async (params: any) => {
   const { payload } = params as any;
   const wallet = await getWallet();
+  const rpc = await getRpc();
 
   const approved = await snap.request({
     method: 'snap_dialog',
@@ -14,6 +16,9 @@ export const tezosSendOperation = async (params: any) => {
         heading('Sign Operation'),
         text('Do you want to sign the following payload?'),
         copyable(JSON.stringify(payload, null, 2)),
+        divider(),
+        text(`The operation will be submit to the following node:`),
+        copyable(rpc.url),
       ]),
     },
   });
@@ -26,5 +31,5 @@ export const tezosSendOperation = async (params: any) => {
     return '';
   }
 
-  return { opHash: await prepareAndSign(payload, wallet) };
+  return { opHash: await prepareAndSign(payload, wallet, rpc.url) };
 };
