@@ -12,7 +12,7 @@ Make sure you have the latest version of [MetaMask Flask](https://metamask.io/fl
 yarn install && yarn start
 ```
 
-Visit http://localhost:8000 to open the demo dApp to connect to MetaMask Flask.
+Visit http://localhost:8000 to open the demo dApp to connect to MetaMask Flask. **NOTE: Make sure you remove any MetaMask extension before you install MetaMask Flask, or use a different Browser / Profile**
 
 ## TODO:
 
