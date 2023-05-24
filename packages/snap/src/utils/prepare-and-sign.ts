@@ -1,4 +1,4 @@
-import { broadcastTransaction } from '../tezos/broadcast-transaction';
+import { injectTransaction } from '../tezos/inject-transaction';
 import { prepareOperations } from '../tezos/prepare-operations';
 import { getSigner } from './get-signer';
 import { sign } from './sign';
@@ -21,5 +21,5 @@ export const prepareAndSign = async (
 
   const signed = await sign(forged, operationWatermark, node);
 
-  return broadcastTransaction(signed.signature.sbytes, rpcUrl);
+  return injectTransaction(signed.signature.sbytes, rpcUrl);
 };

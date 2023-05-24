@@ -26,7 +26,7 @@
     "serve": "mm-snap serve",
     "start": "mm-snap watch",
     "test": "yarn run test:unit && yarn run cover:report",
-    "test:unit": "nyc --check-coverage --statements 80 --branches 80 --functions 80 --lines 80 mocha --colors -r ts-node/register \"**/*.test.ts\""
+    "test:unit": "nyc --check-coverage --statements 80 --branches 80 --functions 80 --lines 80 mocha --colors -r ts-node/register -r jsdom-global/register \"**/*.test.ts\""
   },
   "dependencies": {
     "@taquito/local-forging": "^15.1.0",
@@ -61,6 +61,8 @@
     "eslint-plugin-jsdoc": "^39.2.9",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "jsdom": "^22.0.0",
+    "jsdom-global": "^3.0.2",
     "mocha": "^9.2.2",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",

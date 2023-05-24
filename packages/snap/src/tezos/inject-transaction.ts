@@ -1,4 +1,4 @@
-export const broadcastTransaction = async (
+export const injectTransaction = async (
   rawTransaction: string,
   rpcUrl: string,
 ): Promise<string> => {

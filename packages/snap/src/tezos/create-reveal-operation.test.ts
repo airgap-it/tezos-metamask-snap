@@ -9,7 +9,7 @@ chai.use(chaiBytes);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('Test function: getRpc', function () {
+describe('Test function: createRevealOperation', function () {
   it('should create reveal operation', async function () {
     const reveal = await createRevealOperation(
       new BigNumber(5),
