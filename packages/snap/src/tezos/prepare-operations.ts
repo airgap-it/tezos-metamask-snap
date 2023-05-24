@@ -40,13 +40,11 @@ export const prepareOperations = async (
       ]).catch((error) => {
         throw new Error(error);
       })
-    ).map((x) => x.json()),
+    ).map((res) => res.json()),
   );
 
   counter = new BigNumber(results[0]).plus(1);
   const branch = results[1];
-
-  console.log(counter, branch);
 
   const accountManager: { key: string } = results[2];
 
@@ -60,11 +58,8 @@ export const prepareOperations = async (
     counter = counter.plus(1);
   }
 
-  // tslint:disable:cyclomatic-complexity
   const operationPromises: Promise<TezosOperation>[] = operationRequests.map(
     async (operationRequest: TezosOperation, index: number) => {
-      // TODO: Handle activation burn
-
       if (!operationRequest.kind) {
         throw new Error(
           `property "kind" was not defined ${JSON.stringify(operationRequest)}`,

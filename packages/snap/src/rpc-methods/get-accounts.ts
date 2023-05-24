@@ -2,9 +2,12 @@ import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getSigner } from '../utils/get-signer';
 import { getWallet } from '../utils/get-wallet';
 
-export const tezosGetAccounts = async (origin: string) => {
+export const tezosGetAccount = async (origin: string) => {
   const wallet = await getWallet();
   const signer = await getSigner(wallet);
+
+  const publicKey = await signer.publicKey();
+  const address = await signer.publicKeyHash();
 
   const approved = await snap.request({
     method: 'snap_dialog',
@@ -15,9 +18,9 @@ export const tezosGetAccounts = async (origin: string) => {
         text(
           `Do you want to allow ${origin} to access your Tezos public key and address?`,
         ),
-        copyable(await signer.publicKey()),
+        copyable(publicKey),
         divider(),
-        copyable(await signer.publicKeyHash()),
+        copyable(address),
       ]),
     },
   });
@@ -28,7 +31,7 @@ export const tezosGetAccounts = async (origin: string) => {
 
   return {
     curve: 'ed25519',
-    publicKey: await signer.publicKey(),
-    address: await signer.publicKeyHash(),
+    publicKey,
+    address,
   };
 };

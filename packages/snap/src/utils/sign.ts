@@ -7,9 +7,7 @@ export const sign = async (
 ) => {
   const signer = await getSigner(node);
 
-  const bytes = payload;
-
-  const signature = await signer.sign(bytes, watermark);
+  const signature = await signer.sign(payload, watermark);
 
   return {
     signature,

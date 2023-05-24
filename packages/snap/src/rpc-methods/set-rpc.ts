@@ -14,7 +14,7 @@ export const tezosSetRpc = async (params: any) => {
   const header = await fetch(
     `${normalisedRpcUrl}chains/main/blocks/head/header`,
   )
-    .then((x) => x.json())
+    .then((res) => res.json())
     .catch(() => {
       throw new Error('Invalid RPC URL');
     });

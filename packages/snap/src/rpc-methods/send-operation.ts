@@ -27,9 +27,5 @@ export const tezosSendOperation = async (params: any) => {
     throw new Error('User rejected');
   }
 
-  if (!wallet) {
-    return '';
-  }
-
   return { opHash: await prepareAndSign(payload, wallet, rpc.url) };
 };

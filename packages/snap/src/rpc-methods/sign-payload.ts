@@ -22,9 +22,5 @@ export const tezosSignPayload = async (params: any) => {
     throw new Error('User rejected');
   }
 
-  if (!wallet) {
-    return '';
-  }
-
   return sign(payload, undefined, wallet);
 };

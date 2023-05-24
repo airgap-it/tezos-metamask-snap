@@ -1,5 +1,5 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { tezosGetAccounts } from './rpc-methods/get-accounts';
+import { tezosGetAccount } from './rpc-methods/get-accounts';
 import { tezosSendOperation } from './rpc-methods/send-operation';
 import { tezosSignPayload } from './rpc-methods/sign-payload';
 import { tezosGetRpc } from './rpc-methods/get-rpc';
@@ -32,13 +32,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  console.log(origin);
   const { method, params } = request;
   const typedMethod: TezosSnapRpcMethods = method as any;
 
   switch (typedMethod) {
     case 'tezos_getAccount':
-      return tezosGetAccounts(origin);
+      return tezosGetAccount(origin);
 
     case 'tezos_sendOperation':
       return tezosSendOperation(params);
