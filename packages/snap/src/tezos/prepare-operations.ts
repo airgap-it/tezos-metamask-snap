@@ -15,7 +15,7 @@ import {
   STORAGE_LIMIT_PLACEHOLDER,
 } from './constants';
 import { estimateAndReplaceLimitsAndFee } from './estimate-fee';
-import { getBalanceOfAddresses } from './get-balances-of-addresses';
+import { getBalanceOfAddress } from './get-balance-of-address';
 
 export const prepareOperations = async (
   address: string,
@@ -72,7 +72,7 @@ export const prepareOperations = async (
       let receivingBalance: BigNumber | undefined;
       if (recipient?.toLowerCase().startsWith('tz')) {
         receivingBalance = new BigNumber(
-          await getBalanceOfAddresses([recipient], rpcUrl),
+          await getBalanceOfAddress(recipient, rpcUrl),
         );
       }
 
