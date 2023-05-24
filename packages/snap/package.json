@@ -1,11 +1,10 @@
 {
-  "name": "snap",
-  "version": "0.1.0",
-  "private": true,
-  "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
+  "name": "tezos-metamask-snap",
+  "version": "1.0.0",
+  "description": "Tezos Snap for MetaMask",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/airgap-it/tezos-metamask-snap.git"
   },
   "license": "(MIT-0 OR Apache-2.0)",
   "main": "src/index.ts",
@@ -19,20 +18,22 @@
     "build:clean": "yarn clean && yarn build",
     "build:website": "node ./scripts/build-website.js",
     "clean": "rimraf dist",
+    "cover:report": "nyc report --reporter=lcov --reporter=text",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "serve": "mm-snap serve",
-    "start": "mm-snap watch"
+    "start": "mm-snap watch",
+    "test": "yarn run test:unit && yarn run cover:report",
+    "test:unit": "nyc --check-coverage --statements 80 --branches 80 --functions 80 --lines 80 mocha --colors -r ts-node/register \"**/*.test.ts\""
   },
   "dependencies": {
     "@taquito/local-forging": "^15.1.0",
     "@taquito/signer": "^15.1.0",
     "bignumber.js": "^9.1.1",
     "bs58check": "^2.1.2",
-    "buffer": "^6.0.3",
-    "stream-browserify": "^3.0.0"
+    "buffer": "^6.0.3"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.0.3",
@@ -44,8 +45,15 @@
     "@metamask/snaps-cli": "^0.30.0",
     "@metamask/snaps-types": "^0.30.0",
     "@metamask/snaps-ui": "^0.30.0",
+    "@types/chai": "^4.3.1",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/sinon": "^10.0.11",
+    "@types/sinon-chai": "^3.2.8",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "chai-bytes": "^0.1.2",
     "eslint": "^8.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.26.0",
@@ -53,9 +61,15 @@
     "eslint-plugin-jsdoc": "^39.2.9",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "mocha": "^9.2.2",
+    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "prettier-plugin-packagejson": "^2.2.11",
     "rimraf": "^3.0.2",
+    "sinon": "^13.0.2",
+    "sinon-chai": "^3.7.0",
+    "stream-browserify": "^3.0.0",
+    "ts-node": "^10.8.1",
     "typescript": "^4.7.4"
   },
   "packageManager": "yarn@3.2.1",
