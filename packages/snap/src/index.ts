@@ -46,7 +46,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return tezosSignPayload(params);
 
     case 'tezos_getRpc':
-      return tezosGetRpc(params);
+      return tezosGetRpc();
 
     case 'tezos_setRpc':
       return tezosSetRpc(params);

@@ -13,7 +13,6 @@ export const getBalanceOfAddress = async (
     ).then((x) => x.json());
     balance = balance.plus(new BigNumber(data));
   } catch (error: any) {
-    console.log('ERROR', error);
     // if node returns 404 (which means 'no account found'), go with 0 balance
     if (error.response && error.response.status !== 404) {
       throw new Error('Error fetching balance');

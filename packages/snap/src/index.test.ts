@@ -158,7 +158,7 @@ describe('Test function: onRpcRequest', function () {
     );
 
     expect(response).to.deep.equal(returnValue);
-    expect(getRpcStub).to.have.been.calledWithExactly(exampleParams);
+    expect(getRpcStub).to.have.been.calledWithExactly();
 
     expect(getAccountStub.callCount).to.equal(0, 'getAccountStub');
     expect(sendOperationStub.callCount).to.equal(0, 'sendOperationsStub');
