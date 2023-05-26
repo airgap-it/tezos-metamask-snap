@@ -22,77 +22,12 @@ import {
   MINIMAL_FEE_PER_GAS_UNIT,
 } from './constants';
 
-export const estimateAndReplaceLimitsAndFee = async (
+const sumUpFees = async (
   tezosWrappedOperation: TezosWrappedOperation,
-  nodeUrl: string,
-  overrideParameters = true,
-  startingCounter?: BigNumber,
-): Promise<TezosWrappedOperation> => {
-  const fakeSignature =
-    'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP';
-  const opKinds = [
-    TezosOperationType.TRANSACTION,
-    TezosOperationType.REVEAL,
-    TezosOperationType.ORIGINATION,
-    TezosOperationType.DELEGATION,
-  ];
-  type TezosOp =
-    | TezosTransactionOperation
-    | TezosRevealOperation
-    | TezosDelegationOperation
-    | TezosOriginationOperation;
-  const contents = tezosWrappedOperation.contents.map((operation, i) => {
-    if (!opKinds.includes(operation.kind)) {
-      return operation;
-    }
-
-    const op = operation as TezosOp;
-    const gasValue = new BigNumber(MAX_GAS_PER_BLOCK).dividedToIntegerBy(
-      tezosWrappedOperation.contents.length,
-    );
-    const gasLimit = new BigNumber(GAS_LIMIT_PLACEHOLDER).gt(gasValue)
-      ? gasValue
-      : GAS_LIMIT_PLACEHOLDER;
-    const counter = startingCounter
-      ? startingCounter.plus(i).toString()
-      : op.counter;
-    return { ...operation, gas_limit: gasLimit, counter };
-  });
-
-  const block: { chain_id: string } = await fetch(
-    `${nodeUrl}chains/main/blocks/head`,
-  ).then((x) => x.json());
-  const body = {
-    chain_id: block.chain_id,
-    operation: {
-      branch: tezosWrappedOperation.branch,
-      contents,
-      signature: fakeSignature, // signature will not be checked, so it is ok to always use this one
-    },
-  };
-  const forgedOperation: string = await localForger.forge(
-    tezosWrappedOperation as any,
-  );
+  response: RunOperationResponse,
+  overrideParameters: boolean,
+): Promise<number> => {
   let gasLimitTotal = 0;
-
-  const response: RunOperationResponse = await fetch(
-    `${nodeUrl}chains/main/blocks/head/helpers/scripts/run_operation`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    },
-  )
-    .then((x) => x.json())
-    .catch((runOperationError: Error) => {
-      throw runOperationError;
-    });
-
-  if (tezosWrappedOperation.contents.length !== response.contents.length) {
-    throw new Error(
-      `Run Operation did not return same number of operations. Locally we have ${tezosWrappedOperation.contents.length}, but got back ${response.contents.length}`,
-    );
-  }
 
   tezosWrappedOperation.contents.forEach(
     (content: TezosOperation, i: number) => {
@@ -178,6 +113,86 @@ export const estimateAndReplaceLimitsAndFee = async (
         gasLimitTotal += gasLimit;
       }
     },
+  );
+
+  return gasLimitTotal;
+};
+
+export const estimateAndReplaceLimitsAndFee = async (
+  tezosWrappedOperation: TezosWrappedOperation,
+  nodeUrl: string,
+  overrideParameters = true,
+  startingCounter?: BigNumber,
+): Promise<TezosWrappedOperation> => {
+  const fakeSignature =
+    'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP';
+  const opKinds = [
+    TezosOperationType.TRANSACTION,
+    TezosOperationType.REVEAL,
+    TezosOperationType.ORIGINATION,
+    TezosOperationType.DELEGATION,
+  ];
+  type TezosOp =
+    | TezosTransactionOperation
+    | TezosRevealOperation
+    | TezosDelegationOperation
+    | TezosOriginationOperation;
+  const contents = tezosWrappedOperation.contents.map((operation, i) => {
+    if (!opKinds.includes(operation.kind)) {
+      return operation;
+    }
+
+    const op = operation as TezosOp;
+    const gasValue = new BigNumber(MAX_GAS_PER_BLOCK).dividedToIntegerBy(
+      tezosWrappedOperation.contents.length,
+    );
+    const gasLimit = new BigNumber(GAS_LIMIT_PLACEHOLDER).gt(gasValue)
+      ? gasValue
+      : GAS_LIMIT_PLACEHOLDER;
+    const counter = startingCounter
+      ? startingCounter.plus(i).toString()
+      : op.counter;
+    return { ...operation, gas_limit: gasLimit, counter };
+  });
+
+  const block: { chain_id: string } = await fetch(
+    `${nodeUrl}chains/main/blocks/head`,
+  ).then((x) => x.json());
+  const body = {
+    chain_id: block.chain_id,
+    operation: {
+      branch: tezosWrappedOperation.branch,
+      contents,
+      signature: fakeSignature, // signature will not be checked, so it is ok to always use this one
+    },
+  };
+  const forgedOperation: string = await localForger.forge(
+    tezosWrappedOperation as any,
+  );
+
+  const response: RunOperationResponse = await fetch(
+    `${nodeUrl}chains/main/blocks/head/helpers/scripts/run_operation`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+  )
+    .then((x) => x.json())
+    .catch((runOperationError: Error) => {
+      throw runOperationError;
+    });
+
+  if (tezosWrappedOperation.contents.length !== response.contents.length) {
+    throw new Error(
+      `Run Operation did not return same number of operations. Locally we have ${tezosWrappedOperation.contents.length}, but got back ${response.contents.length}`,
+    );
+  }
+
+  const gasLimitTotal = await sumUpFees(
+    tezosWrappedOperation,
+    response,
+    overrideParameters,
   );
 
   if (
