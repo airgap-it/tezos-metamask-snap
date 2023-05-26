@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
 import { prepareAndSign } from './prepare-and-sign';
 import { bip32Entropy } from '../../test/constants.test';
-import { DEFAULT_RPC_URL } from '../constants';
+import { DEFAULT_NODE_URL } from '../constants';
 import * as prepareOperationMethods from '../tezos/prepare-operations';
 import * as injectTransactionMethods from '../tezos/inject-transaction';
 
@@ -29,7 +29,7 @@ describe('Test function: prepareAndSign', function () {
     const hash = await prepareAndSign(
       [],
       { ed25519: bip32Entropy },
-      DEFAULT_RPC_URL,
+      DEFAULT_NODE_URL,
     );
 
     expect(hash).to.equal('op...');

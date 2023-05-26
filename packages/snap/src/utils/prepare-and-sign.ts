@@ -6,7 +6,7 @@ import { sign } from './sign';
 export const prepareAndSign = async (
   operations: any[],
   node: { ed25519: any },
-  rpcUrl: string,
+  nodeUrl: string,
 ) => {
   const operationWatermark = new Uint8Array([3]);
 
@@ -16,10 +16,10 @@ export const prepareAndSign = async (
     await signer.publicKeyHash(),
     await signer.publicKey(),
     operations,
-    rpcUrl,
+    nodeUrl,
   );
 
   const signed = await sign(forged, operationWatermark, node);
 
-  return injectTransaction(signed.signature.sbytes, rpcUrl);
+  return injectTransaction(signed.signature.sbytes, nodeUrl);
 };

@@ -6,7 +6,7 @@ import chaiBytes from 'chai-bytes';
 import { SnapStorage } from '../types';
 import { SnapMock } from '../../test/snap.mock.test';
 import { getRpc } from './get-rpc';
-import { DEFAULT_RPC_URL } from '../constants';
+import { DEFAULT_NODE_URL } from '../constants';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);
@@ -17,7 +17,7 @@ describe('Test function: getRpc', function () {
   const state: SnapStorage = {
     rpc: {
       network: 'mainnet',
-      url: 'https://test.com/',
+      nodeUrl: 'https://test.com/',
     },
   };
 
@@ -32,7 +32,10 @@ describe('Test function: getRpc', function () {
 
   it('should return the RPC storage defaults', async function () {
     const rpc = await getRpc();
-    expect(rpc).to.deep.equal({ network: 'mainnet', url: DEFAULT_RPC_URL });
+    expect(rpc).to.deep.equal({
+      network: 'mainnet',
+      nodeUrl: DEFAULT_NODE_URL,
+    });
     expect(snapStub.rpcStubs.snap_manageState.callCount).to.equal(1);
     expect(snapStub.rpcStubs.snap_manageState.firstCall.args[0]).to.deep.equal({
       operation: 'get',
