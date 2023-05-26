@@ -1,7 +1,7 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getRpc } from '../utils/get-rpc';
 
-export const tezosGetRpc = async (_params: any) => {
+export const tezosGetRpc = async () => {
   const rpc = await getRpc();
 
   const approved = await snap.request({
@@ -15,7 +15,7 @@ export const tezosGetRpc = async (_params: any) => {
         ),
         divider(),
         text(rpc.network),
-        copyable(rpc.url),
+        copyable(rpc.nodeUrl),
       ]),
     },
   });
@@ -26,6 +26,6 @@ export const tezosGetRpc = async (_params: any) => {
 
   return {
     network: rpc.network,
-    rpcUrl: rpc.url,
+    nodeUrl: rpc.nodeUrl,
   };
 };

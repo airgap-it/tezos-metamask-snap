@@ -145,7 +145,7 @@ describe('Test function: onRpcRequest', function () {
   it('should handle tezosGetRpc request', async function () {
     const returnValue = {
       network: 'mainnet',
-      rpcUrl: 'https://test.com',
+      nodeUrl: 'https://test.com',
     };
 
     getRpcStub.restore();
@@ -171,7 +171,7 @@ describe('Test function: onRpcRequest', function () {
   it('should handle tezosSetRpc request', async function () {
     const returnValue = {
       network: 'mainnet',
-      rpcUrl: 'https://test.com',
+      nodeUrl: 'https://test.com',
     };
 
     setRpcStub.restore();
@@ -197,7 +197,7 @@ describe('Test function: onRpcRequest', function () {
   it('should handle tezosClearRpc request', async function () {
     const returnValue = {
       network: 'mainnet',
-      rpcUrl: 'https://test.com',
+      nodeUrl: 'https://test.com',
     };
 
     clearRpcStub.restore();

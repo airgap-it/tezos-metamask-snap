@@ -1,10 +1,10 @@
 export const injectTransaction = async (
   rawTransaction: string,
-  rpcUrl: string,
+  nodeUrl: string,
 ): Promise<string> => {
   const payload: string = rawTransaction;
 
-  const response = await fetch(`${rpcUrl}injection/operation?chain=main`, {
+  const response = await fetch(`${nodeUrl}injection/operation?chain=main`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(payload),

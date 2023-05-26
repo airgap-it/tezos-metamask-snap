@@ -1,5 +1,5 @@
 import { panel, heading, text } from '@metamask/snaps-ui';
-import { DEFAULT_RPC_URL } from '../constants';
+import { DEFAULT_NODE_URL } from '../constants';
 
 export const tezosClearRpc = async (_params: any) => {
   const approved = await snap.request({
@@ -28,6 +28,6 @@ export const tezosClearRpc = async (_params: any) => {
 
   return {
     network: 'mainnet',
-    rpcUrl: DEFAULT_RPC_URL,
+    nodeUrl: DEFAULT_NODE_URL,
   };
 };

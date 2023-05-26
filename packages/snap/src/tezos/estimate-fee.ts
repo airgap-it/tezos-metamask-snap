@@ -24,7 +24,7 @@ import {
 
 export const estimateAndReplaceLimitsAndFee = async (
   tezosWrappedOperation: TezosWrappedOperation,
-  rpcUrl: string,
+  nodeUrl: string,
   overrideParameters = true,
   startingCounter?: BigNumber,
 ): Promise<TezosWrappedOperation> => {
@@ -60,7 +60,7 @@ export const estimateAndReplaceLimitsAndFee = async (
   });
 
   const block: { chain_id: string } = await fetch(
-    `${rpcUrl}chains/main/blocks/head`,
+    `${nodeUrl}chains/main/blocks/head`,
   ).then((x) => x.json());
   const body = {
     chain_id: block.chain_id,
@@ -76,7 +76,7 @@ export const estimateAndReplaceLimitsAndFee = async (
   let gasLimitTotal = 0;
 
   const response: RunOperationResponse = await fetch(
-    `${rpcUrl}chains/main/blocks/head/helpers/scripts/run_operation`,
+    `${nodeUrl}chains/main/blocks/head/helpers/scripts/run_operation`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -2,14 +2,14 @@ import BigNumber from 'bignumber.js';
 
 export const getBalanceOfAddress = async (
   address: string,
-  rpcUrl: string,
+  nodeUrl: string,
   _data?: any,
 ): Promise<string> => {
   let balance: BigNumber = new BigNumber(0);
 
   try {
     const data = await fetch(
-      `${rpcUrl}chains/main/blocks/head/context/contracts/${address}/balance`,
+      `${nodeUrl}chains/main/blocks/head/context/contracts/${address}/balance`,
     ).then((x) => x.json());
     balance = balance.plus(new BigNumber(data));
   } catch (error: any) {

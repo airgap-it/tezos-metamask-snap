@@ -4,7 +4,7 @@ import { prepareAndSign } from '../utils/prepare-and-sign';
 import { getRpc } from '../utils/get-rpc';
 
 export const tezosSendOperation = async (params: any) => {
-  const { payload } = params as any;
+  const { payload } = params;
   const wallet = await getWallet();
   const rpc = await getRpc();
 
@@ -18,7 +18,7 @@ export const tezosSendOperation = async (params: any) => {
         copyable(JSON.stringify(payload, null, 2)),
         divider(),
         text(`The operation will be submit to the following node:`),
-        copyable(rpc.url),
+        copyable(rpc.nodeUrl),
       ]),
     },
   });
@@ -27,5 +27,5 @@ export const tezosSendOperation = async (params: any) => {
     throw new Error('User rejected');
   }
 
-  return { opHash: await prepareAndSign(payload, wallet, rpc.url) };
+  return { opHash: await prepareAndSign(payload, wallet, rpc.nodeUrl) };
 };
