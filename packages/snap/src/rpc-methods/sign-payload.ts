@@ -3,7 +3,7 @@ import { getWallet } from '../utils/get-wallet';
 import { sign } from '../utils/sign';
 
 export const tezosSignPayload = async (params: any) => {
-  const { payload } = params as any;
+  const { payload } = params;
   const wallet = await getWallet();
 
   const approved = await snap.request({
