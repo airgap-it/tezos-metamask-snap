@@ -1,9 +1,9 @@
 import BigNumber from 'bignumber.js';
 import chai, { expect } from 'chai';
-import { createRevealOperation } from './create-reveal-operation';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
+import { createRevealOperation } from './create-reveal-operation';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);

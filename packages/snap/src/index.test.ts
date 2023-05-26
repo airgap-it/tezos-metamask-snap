@@ -2,7 +2,8 @@ import chai, { expect } from 'chai';
 import chaiBytes from 'chai-bytes';
 import chaiAsPromised from 'chai-as-promised';
 
-import { onRpcRequest } from './index';
+import * as sinon from 'sinon';
+import { Json, JsonRpcRequest } from '@metamask/snaps-types';
 import * as getAccountMethods from './rpc-methods/get-accounts';
 import * as sendOperationMethods from './rpc-methods/send-operation';
 import * as signPayloadMethods from './rpc-methods/sign-payload';
@@ -10,8 +11,7 @@ import * as getRpcMethods from './rpc-methods/get-rpc';
 import * as setRpcMethods from './rpc-methods/set-rpc';
 import * as clearRpcMethods from './rpc-methods/clear-rpc';
 
-import * as sinon from 'sinon';
-import { Json, JsonRpcRequest } from '@metamask/snaps-types';
+import { onRpcRequest } from '.';
 
 chai.use(chaiBytes);
 chai.use(chaiAsPromised);
@@ -56,6 +56,7 @@ describe('Test function: onRpcRequest', function () {
     setRpcStub = sinon.stub(setRpcMethods, 'tezosSetRpc');
     clearRpcStub = sinon.stub(clearRpcMethods, 'tezosClearRpc');
   });
+
   afterEach(function () {
     sinon.restore();
   });

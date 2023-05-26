@@ -1,11 +1,11 @@
 import chai, { expect } from 'chai';
-import { tezosGetRpc } from './get-rpc';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
 import * as sinon from 'sinon';
 import * as getRpcMethods from '../utils/get-rpc';
 import { SnapMock } from '../../test/snap.mock.test';
+import { tezosGetRpc } from './get-rpc';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);

@@ -12,6 +12,7 @@ describe('Test function: hexStringToUInt8Array', function () {
     expect(hexStringToUInt8Array('0022')).to.equalBytes(
       new Uint8Array([0, 34]),
     );
+
     expect(hexStringToUInt8Array('a7b9ff5722429d')).to.equalBytes(
       new Uint8Array([167, 185, 255, 87, 34, 66, 157]),
     );

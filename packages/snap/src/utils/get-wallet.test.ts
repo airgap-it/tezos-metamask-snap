@@ -3,9 +3,9 @@ import * as sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
-import { getWallet } from './get-wallet';
 import { SnapMock } from '../../test/snap.mock.test';
 import { bip32Entropy } from '../../test/constants.test';
+import { getWallet } from './get-wallet';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);

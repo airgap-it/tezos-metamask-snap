@@ -1,11 +1,10 @@
-import BigNumber from 'bignumber.js';
 import chai, { expect } from 'chai';
-import { injectTransaction } from './inject-transaction';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
 import * as sinon from 'sinon';
 import { jsonOk } from '../../test/utils.test';
+import { injectTransaction } from './inject-transaction';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);

@@ -5,8 +5,8 @@ import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
 import { SnapStorage } from '../types';
 import { SnapMock } from '../../test/snap.mock.test';
-import { getRpc } from './get-rpc';
 import { DEFAULT_NODE_URL } from '../constants';
+import { getRpc } from './get-rpc';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);

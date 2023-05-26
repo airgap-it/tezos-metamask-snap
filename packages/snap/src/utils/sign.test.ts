@@ -3,8 +3,8 @@ import * as sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
-import { sign } from './sign';
 import { bip32Entropy } from '../../test/constants.test';
+import { sign } from './sign';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);

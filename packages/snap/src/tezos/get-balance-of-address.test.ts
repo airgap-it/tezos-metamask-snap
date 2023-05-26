@@ -1,25 +1,15 @@
 import BigNumber from 'bignumber.js';
 import chai, { expect } from 'chai';
-import { getBalanceOfAddress } from './get-balance-of-address';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
 import * as sinon from 'sinon';
+import { jsonOk } from '../../test/utils.test';
+import { getBalanceOfAddress } from './get-balance-of-address';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
-
-function jsonOk(body: any) {
-  const mockResponse = new global.Response(JSON.stringify(body), {
-    status: 200,
-    headers: {
-      'Content-type': 'application/json',
-    },
-  });
-
-  return Promise.resolve(mockResponse);
-}
 
 describe('Test function: getBalanceOfAddress', function () {
   afterEach(function () {

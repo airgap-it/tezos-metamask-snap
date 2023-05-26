@@ -3,8 +3,9 @@ import * as sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
-import { getSigner } from './get-signer';
 import { bip32Entropy } from '../../test/constants.test';
+import { getSigner } from './get-signer';
+
 chai.use(chaiBytes);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -21,6 +22,7 @@ describe('Test function: getSigner', function () {
     expect(await signer.publicKey()).to.be.equal(
       'edpkvRupRPuHmoUx2zMgbDibs4KMD6ZwqEp6PePzSwhKkQ6pVxoU3u',
     );
+
     expect(await signer.publicKeyHash()).to.be.equal(
       'tz1bQrTEReXZKRwZWBy7gAJqbNCvrzqXzY1J',
     );
