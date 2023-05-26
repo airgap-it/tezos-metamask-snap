@@ -6,7 +6,7 @@ export const hexStringToUInt8Array = (hexString: string): Uint8Array => {
   const arrayBuffer = new Uint8Array(hexString.length / 2);
 
   for (let i = 0; i < hexString.length; i += 2) {
-    const byteValue = parseInt(hexString.substr(i, 2), 16);
+    const byteValue = parseInt(hexString.substring(i, i + 2), 16);
     if (isNaN(byteValue)) {
       throw new Error('Hex String has invalid character');
     }
