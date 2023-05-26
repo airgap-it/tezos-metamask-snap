@@ -76,7 +76,7 @@ export const prepareOperations = async (
         );
       }
 
-      const defaultCounter: string = counter.plus(index).toFixed(); // TODO: Handle counter if we have some operations without counters in the array
+      const defaultCounter: string = counter.plus(index).toFixed();
       const defaultFee: string = FEE_PLACEHOLDER;
       const defaultGasLimit = '10300';
       const defaultStorageLimit: string =
@@ -87,7 +87,6 @@ export const prepareOperations = async (
           : '0'; // taken from eztz
 
       switch (operationRequest.kind) {
-        // TODO: Handle if the dApp already provides a reveal operation
         case TezosOperationType.REVEAL:
           // eslint-disable-next-line no-case-declarations
           const revealOperation: TezosRevealOperation =
