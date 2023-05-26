@@ -1,5 +1,7 @@
 # tezos-metamask-snap
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=airgap-it_tezos-metamask-snap&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=airgap-it_tezos-metamask-snap)
+
 This snap adds Tezos support to MetaMask.
 
 WARNING: This is an early prototype. Any contributions are welcome.
