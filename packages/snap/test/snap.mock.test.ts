@@ -20,14 +20,10 @@ export class SnapMock implements Snap {
     snap_manageState: stub(),
   };
 
+  // eslint-disable-next-line jsdoc/require-param, jsdoc/require-returns
   /**
    * Calls this.requestStub or this.rpcStubs[req.method], if the method has
    * a dedicated stub.
-   *
-   * @param args - The arguments of the rpc call
-   * @param args.method - The method of the request
-   * @param args.params - The parameters of the request
-   * @returns Sinon Stub
    */
   public request(args: {
     method: string;
