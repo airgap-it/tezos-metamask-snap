@@ -41,4 +41,10 @@ module.exports = {
     '**/public',
     '**/.cache',
   ],
+
+  settings: {
+    jest: {
+      version: 26,
+    },
+  },
 };
