@@ -33,7 +33,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   const { method, params } = request;
-  const typedMethod: TezosSnapRpcMethods = method as any;
+  const typedMethod = method as TezosSnapRpcMethods;
 
   switch (typedMethod) {
     case 'tezos_getAccount':
