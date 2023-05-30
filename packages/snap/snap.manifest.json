@@ -7,7 +7,7 @@
     "url": "https://github.com/airgap-it/tezos-metamask-snap.git"
   },
   "source": {
-    "shasum": "C90RVoMCO7xHsead4H3tN3spXEzOpI3YGKyNxf+lpM0=",
+    "shasum": "h8NDQ0VCOBviDBsniKUdP4vDdDEiOs91QgO1j67aaXk=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

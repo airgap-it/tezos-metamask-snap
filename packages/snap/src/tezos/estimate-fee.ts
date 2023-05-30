@@ -27,41 +27,46 @@ const sumUpInternalFees = async (metadata: RunOperationMetadata) => {
   let gasLimit = 0;
   let storageLimit = 0;
 
-  // If there are internal operations, we first add gas and storage used of internal operations
-  if (metadata.internal_operation_results) {
-    metadata.internal_operation_results.forEach(
-      (internalOperation: RunOperationInternalOperationResult) => {
-        if (internalOperation?.result) {
-          if (internalOperation.result.errors) {
-            throw new Error(
-              `An internal operation produced an error ${JSON.stringify(
-                internalOperation.result.errors,
-              )}`,
-            );
-          }
-
-          gasLimit += Math.ceil(
-            Number(internalOperation.result.consumed_milligas) / 1000,
-          );
-
-          if (internalOperation.result.paid_storage_size_diff) {
-            storageLimit += Number(
-              internalOperation.result.paid_storage_size_diff,
-            );
-          }
-
-          if (internalOperation.result.originated_contracts) {
-            storageLimit +=
-              internalOperation.result.originated_contracts.length * 257;
-          }
-
-          if (internalOperation.result.allocated_destination_contract) {
-            storageLimit += 257;
-          }
-        }
-      },
-    );
+  if (!metadata.internal_operation_results) {
+    return {
+      gasLimit,
+      storageLimit,
+    };
   }
+
+  // If there are internal operations, we first add gas and storage used of internal operations
+  metadata.internal_operation_results.forEach(
+    (internalOperation: RunOperationInternalOperationResult) => {
+      if (internalOperation?.result) {
+        if (internalOperation.result.errors) {
+          throw new Error(
+            `An internal operation produced an error ${JSON.stringify(
+              internalOperation.result.errors,
+            )}`,
+          );
+        }
+
+        gasLimit += Math.ceil(
+          Number(internalOperation.result.consumed_milligas) / 1000,
+        );
+
+        if (internalOperation.result.paid_storage_size_diff) {
+          storageLimit += Number(
+            internalOperation.result.paid_storage_size_diff,
+          );
+        }
+
+        if (internalOperation.result.originated_contracts) {
+          storageLimit +=
+            internalOperation.result.originated_contracts.length * 257;
+        }
+
+        if (internalOperation.result.allocated_destination_contract) {
+          storageLimit += 257;
+        }
+      }
+    },
+  );
 
   return {
     gasLimit,
@@ -79,49 +84,50 @@ const sumUpFees = async (
   tezosWrappedOperation.contents.forEach(
     async (content: TezosOperation, i: number) => {
       const { metadata } = response.contents[i];
-      if (metadata.operation_result) {
-        const operation: TezosOperation = content;
-
-        const result: RunOperationOperationResult = metadata.operation_result;
-
-        if (result.errors) {
-          throw new Error(
-            `The operation produced an error ${JSON.stringify(result.errors)}`,
-          );
-        }
-
-        let { gasLimit, storageLimit } = await sumUpInternalFees(metadata);
-
-        // Add gas and storage used by operation
-        gasLimit += Math.ceil(Number(result.consumed_milligas) / 1000);
-
-        if (result.paid_storage_size_diff) {
-          storageLimit += Number(result.paid_storage_size_diff);
-        }
-
-        if (result.originated_contracts) {
-          storageLimit += result.originated_contracts.length * 257;
-        }
-
-        if (result.allocated_destination_contract) {
-          storageLimit += 257;
-        }
-
-        if (
-          ((operation as any).gas_limit && overrideParameters) ||
-          (operation as any).gas_limit === GAS_LIMIT_PLACEHOLDER
-        ) {
-          (operation as any).gas_limit = gasLimit.toString();
-        }
-
-        if (
-          ((operation as any).storage_limit && overrideParameters) ||
-          (operation as any).storage_limit === STORAGE_LIMIT_PLACEHOLDER
-        ) {
-          (operation as any).storage_limit = storageLimit.toString();
-        }
-        gasLimitTotal += gasLimit;
+      if (!metadata.operation_result) {
+        return;
       }
+      const operation: TezosOperation = content;
+
+      const result: RunOperationOperationResult = metadata.operation_result;
+
+      if (result.errors) {
+        throw new Error(
+          `The operation produced an error ${JSON.stringify(result.errors)}`,
+        );
+      }
+
+      let { gasLimit, storageLimit } = await sumUpInternalFees(metadata);
+
+      // Add gas and storage used by operation
+      gasLimit += Math.ceil(Number(result.consumed_milligas) / 1000);
+
+      if (result.paid_storage_size_diff) {
+        storageLimit += Number(result.paid_storage_size_diff);
+      }
+
+      if (result.originated_contracts) {
+        storageLimit += result.originated_contracts.length * 257;
+      }
+
+      if (result.allocated_destination_contract) {
+        storageLimit += 257;
+      }
+
+      if (
+        ((operation as any).gas_limit && overrideParameters) ||
+        (operation as any).gas_limit === GAS_LIMIT_PLACEHOLDER
+      ) {
+        (operation as any).gas_limit = gasLimit.toString();
+      }
+
+      if (
+        ((operation as any).storage_limit && overrideParameters) ||
+        (operation as any).storage_limit === STORAGE_LIMIT_PLACEHOLDER
+      ) {
+        (operation as any).storage_limit = storageLimit.toString();
+      }
+      gasLimitTotal += gasLimit;
     },
   );
 
