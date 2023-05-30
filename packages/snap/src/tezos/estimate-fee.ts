@@ -11,6 +11,7 @@ import {
   TezosOperation,
   RunOperationOperationResult,
   RunOperationInternalOperationResult,
+  RunOperationMetadata,
 } from './types';
 import {
   MAX_GAS_PER_BLOCK,
@@ -22,6 +23,52 @@ import {
   MINIMAL_FEE_PER_GAS_UNIT,
 } from './constants';
 
+const sumUpInternalFees = async (metadata: RunOperationMetadata) => {
+  let gasLimit = 0;
+  let storageLimit = 0;
+
+  // If there are internal operations, we first add gas and storage used of internal operations
+  if (metadata.internal_operation_results) {
+    metadata.internal_operation_results.forEach(
+      (internalOperation: RunOperationInternalOperationResult) => {
+        if (internalOperation?.result) {
+          if (internalOperation.result.errors) {
+            throw new Error(
+              `An internal operation produced an error ${JSON.stringify(
+                internalOperation.result.errors,
+              )}`,
+            );
+          }
+
+          gasLimit += Math.ceil(
+            Number(internalOperation.result.consumed_milligas) / 1000,
+          );
+
+          if (internalOperation.result.paid_storage_size_diff) {
+            storageLimit += Number(
+              internalOperation.result.paid_storage_size_diff,
+            );
+          }
+
+          if (internalOperation.result.originated_contracts) {
+            storageLimit +=
+              internalOperation.result.originated_contracts.length * 257;
+          }
+
+          if (internalOperation.result.allocated_destination_contract) {
+            storageLimit += 257;
+          }
+        }
+      },
+    );
+  }
+
+  return {
+    gasLimit,
+    storageLimit,
+  };
+};
+
 const sumUpFees = async (
   tezosWrappedOperation: TezosWrappedOperation,
   response: RunOperationResponse,
@@ -30,56 +77,20 @@ const sumUpFees = async (
   let gasLimitTotal = 0;
 
   tezosWrappedOperation.contents.forEach(
-    (content: TezosOperation, i: number) => {
+    async (content: TezosOperation, i: number) => {
       const { metadata } = response.contents[i];
       if (metadata.operation_result) {
         const operation: TezosOperation = content;
 
         const result: RunOperationOperationResult = metadata.operation_result;
-        let gasLimit = 0;
-        let storageLimit = 0;
-
-        // If there are internal operations, we first add gas and storage used of internal operations
-        if (metadata.internal_operation_results) {
-          metadata.internal_operation_results.forEach(
-            (internalOperation: RunOperationInternalOperationResult) => {
-              if (internalOperation?.result) {
-                if (internalOperation.result.errors) {
-                  throw new Error(
-                    `An internal operation produced an error ${JSON.stringify(
-                      internalOperation.result.errors,
-                    )}`,
-                  );
-                }
-
-                gasLimit += Math.ceil(
-                  Number(internalOperation.result.consumed_milligas) / 1000,
-                );
-
-                if (internalOperation.result.paid_storage_size_diff) {
-                  storageLimit += Number(
-                    internalOperation.result.paid_storage_size_diff,
-                  );
-                }
-
-                if (internalOperation.result.originated_contracts) {
-                  storageLimit +=
-                    internalOperation.result.originated_contracts.length * 257;
-                }
-
-                if (internalOperation.result.allocated_destination_contract) {
-                  storageLimit += 257;
-                }
-              }
-            },
-          );
-        }
 
         if (result.errors) {
           throw new Error(
             `The operation produced an error ${JSON.stringify(result.errors)}`,
           );
         }
+
+        let { gasLimit, storageLimit } = await sumUpInternalFees(metadata);
 
         // Add gas and storage used by operation
         gasLimit += Math.ceil(Number(result.consumed_milligas) / 1000);
@@ -96,7 +107,6 @@ const sumUpFees = async (
           storageLimit += 257;
         }
 
-        // in prepareTransactionsFromPublicKey() we invoke this method with overrideParameters = false
         if (
           ((operation as any).gas_limit && overrideParameters) ||
           (operation as any).gas_limit === GAS_LIMIT_PLACEHOLDER
