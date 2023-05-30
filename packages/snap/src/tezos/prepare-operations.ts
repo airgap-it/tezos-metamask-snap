@@ -17,6 +17,116 @@ import {
 import { estimateAndReplaceLimitsAndFee } from './estimate-fee';
 import { getBalanceOfAddress } from './get-balance-of-address';
 
+const handleRevealOperation = async (
+  operationRequest: TezosOperation,
+  address: string,
+  defaultCounter: string,
+  defaultFee: string,
+  defaultGasLimit: string,
+  defaultStorageLimit: string,
+) => {
+  const revealOperation: TezosRevealOperation =
+    operationRequest as TezosRevealOperation;
+
+  if (!revealOperation.public_key) {
+    throw new Error('property "public_key" was not defined');
+  }
+
+  revealOperation.source = revealOperation.source ?? address;
+  revealOperation.counter = revealOperation.counter ?? defaultCounter;
+  revealOperation.fee = revealOperation.fee ?? defaultFee;
+  revealOperation.gas_limit = revealOperation.gas_limit ?? defaultGasLimit;
+
+  revealOperation.storage_limit =
+    revealOperation.storage_limit ?? defaultStorageLimit;
+
+  return revealOperation;
+};
+
+const handleDelegationOperation = async (
+  operationRequest: TezosOperation,
+  address: string,
+  defaultCounter: string,
+  defaultFee: string,
+  defaultGasLimit: string,
+  defaultStorageLimit: string,
+) => {
+  // eslint-disable-next-line no-case-declarations
+  const delegationOperation: TezosDelegationOperation =
+    operationRequest as TezosDelegationOperation;
+
+  // The delegate property is optional, so we don't have any mandatory properties to check for
+
+  delegationOperation.source = delegationOperation.source ?? address;
+  delegationOperation.counter = delegationOperation.counter ?? defaultCounter;
+  delegationOperation.fee = delegationOperation.fee ?? defaultFee;
+  delegationOperation.gas_limit =
+    delegationOperation.gas_limit ?? defaultGasLimit;
+
+  delegationOperation.storage_limit =
+    delegationOperation.storage_limit ?? defaultStorageLimit;
+
+  return delegationOperation;
+};
+
+const handleTransactionOperation = async (
+  operationRequest: TezosOperation,
+  address: string,
+  defaultCounter: string,
+  defaultFee: string,
+) => {
+  const transactionOperation: TezosTransactionOperation =
+    operationRequest as TezosTransactionOperation;
+
+  if (!transactionOperation.amount) {
+    throw new Error('property "amount" was not defined');
+  }
+
+  if (!transactionOperation.destination) {
+    throw new Error('property "destination" was not defined');
+  }
+
+  transactionOperation.source = transactionOperation.source ?? address;
+  transactionOperation.counter = transactionOperation.counter ?? defaultCounter;
+  transactionOperation.fee = transactionOperation.fee ?? defaultFee;
+  transactionOperation.gas_limit =
+    transactionOperation.gas_limit ?? GAS_LIMIT_PLACEHOLDER;
+
+  transactionOperation.storage_limit =
+    transactionOperation.storage_limit ?? STORAGE_LIMIT_PLACEHOLDER;
+
+  return transactionOperation;
+};
+
+const handleOriginationOperation = async (
+  operationRequest: TezosOperation,
+  address: string,
+  defaultCounter: string,
+  defaultFee: string,
+) => {
+  const originationOperation: TezosOriginationOperation =
+    operationRequest as TezosOriginationOperation;
+
+  if (!originationOperation.balance) {
+    throw new Error('property "balance" was not defined');
+  }
+
+  if (!originationOperation.script) {
+    throw new Error('property "script" was not defined');
+  }
+
+  originationOperation.source = originationOperation.source ?? address;
+  originationOperation.counter = originationOperation.counter ?? defaultCounter;
+  originationOperation.fee = originationOperation.fee ?? defaultFee;
+  originationOperation.gas_limit =
+    originationOperation.gas_limit ?? GAS_LIMIT_PLACEHOLDER;
+
+  originationOperation.storage_limit =
+    originationOperation.storage_limit ?? STORAGE_LIMIT_PLACEHOLDER;
+
+  return originationOperation;
+};
+
 export const prepareOperations = async (
   address: string,
   publicKey: string,
@@ -88,90 +198,41 @@ export const prepareOperations = async (
 
       switch (operationRequest.kind) {
         case TezosOperationType.REVEAL:
-          // eslint-disable-next-line no-case-declarations
-          const revealOperation: TezosRevealOperation =
-            operationRequest as TezosRevealOperation;
+          return handleRevealOperation(
+            operationRequest,
+            address,
+            defaultCounter,
+            defaultFee,
+            defaultGasLimit,
+            defaultStorageLimit,
+          );
 
-          if (!revealOperation.public_key) {
-            throw new Error('property "public_key" was not defined');
-          }
-
-          revealOperation.source = revealOperation.source ?? address;
-          revealOperation.counter = revealOperation.counter ?? defaultCounter;
-          revealOperation.fee = revealOperation.fee ?? defaultFee;
-          revealOperation.gas_limit =
-            revealOperation.gas_limit ?? defaultGasLimit;
-
-          revealOperation.storage_limit =
-            revealOperation.storage_limit ?? defaultStorageLimit;
-
-          return revealOperation;
         case TezosOperationType.DELEGATION:
-          // eslint-disable-next-line no-case-declarations
-          const delegationOperation: TezosDelegationOperation =
-            operationRequest as TezosDelegationOperation;
+          return handleDelegationOperation(
+            operationRequest,
+            address,
+            defaultCounter,
+            defaultFee,
+            defaultGasLimit,
+            defaultStorageLimit,
+          );
 
-          // The delegate property is optional, so we don't have any mandatory properties to check for
-
-          delegationOperation.source = delegationOperation.source ?? address;
-          delegationOperation.counter =
-            delegationOperation.counter ?? defaultCounter;
-          delegationOperation.fee = delegationOperation.fee ?? defaultFee;
-          delegationOperation.gas_limit =
-            delegationOperation.gas_limit ?? defaultGasLimit;
-
-          delegationOperation.storage_limit =
-            delegationOperation.storage_limit ?? defaultStorageLimit;
-
-          return delegationOperation;
         case TezosOperationType.TRANSACTION:
-          // eslint-disable-next-line no-case-declarations
-          const transactionOperation: TezosTransactionOperation =
-            operationRequest as TezosTransactionOperation;
+          return handleTransactionOperation(
+            operationRequest,
+            address,
+            defaultCounter,
+            defaultFee,
+          );
 
-          if (!transactionOperation.amount) {
-            throw new Error('property "amount" was not defined');
-          }
-
-          if (!transactionOperation.destination) {
-            throw new Error('property "destination" was not defined');
-          }
-
-          transactionOperation.source = transactionOperation.source ?? address;
-          transactionOperation.counter =
-            transactionOperation.counter ?? defaultCounter;
-          transactionOperation.fee = transactionOperation.fee ?? defaultFee;
-          transactionOperation.gas_limit =
-            transactionOperation.gas_limit ?? GAS_LIMIT_PLACEHOLDER;
-
-          transactionOperation.storage_limit =
-            transactionOperation.storage_limit ?? STORAGE_LIMIT_PLACEHOLDER;
-
-          return transactionOperation;
         case TezosOperationType.ORIGINATION:
-          // eslint-disable-next-line no-case-declarations
-          const originationOperation: TezosOriginationOperation =
-            operationRequest as TezosOriginationOperation;
+          return handleOriginationOperation(
+            operationRequest,
+            address,
+            defaultCounter,
+            defaultFee,
+          );
 
-          if (!originationOperation.balance) {
-            throw new Error('property "balance" was not defined');
-          }
-
-          if (!originationOperation.script) {
-            throw new Error('property "script" was not defined');
-          }
-
-          originationOperation.source = originationOperation.source ?? address;
-          originationOperation.counter =
-            originationOperation.counter ?? defaultCounter;
-          originationOperation.fee = originationOperation.fee ?? defaultFee;
-          originationOperation.gas_limit =
-            originationOperation.gas_limit ?? GAS_LIMIT_PLACEHOLDER;
-
-          originationOperation.storage_limit =
-            originationOperation.storage_limit ?? STORAGE_LIMIT_PLACEHOLDER;
-
-          return originationOperation;
         case TezosOperationType.ENDORSEMENT:
         case TezosOperationType.SEED_NONCE_REVELATION:
         case TezosOperationType.DOUBLE_ENDORSEMENT_EVIDENCE:
