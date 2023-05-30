@@ -23,7 +23,7 @@ import {
   MINIMAL_FEE_PER_GAS_UNIT,
 } from './constants';
 
-const sumUpInternalFees = async (metadata: RunOperationMetadata) => {
+const sumUpInternalFees = (metadata: RunOperationMetadata) => {
   let gasLimit = 0;
   let storageLimit = 0;
 
@@ -82,11 +82,12 @@ const sumUpFees = async (
   let gasLimitTotal = 0;
 
   tezosWrappedOperation.contents.forEach(
-    async (content: TezosOperation, i: number) => {
+    (content: TezosOperation, i: number) => {
       const { metadata } = response.contents[i];
       if (!metadata.operation_result) {
         return;
       }
+
       const operation: TezosOperation = content;
 
       const result: RunOperationOperationResult = metadata.operation_result;
@@ -97,7 +98,7 @@ const sumUpFees = async (
         );
       }
 
-      let { gasLimit, storageLimit } = await sumUpInternalFees(metadata);
+      let { gasLimit, storageLimit } = sumUpInternalFees(metadata);
 
       // Add gas and storage used by operation
       gasLimit += Math.ceil(Number(result.consumed_milligas) / 1000);
