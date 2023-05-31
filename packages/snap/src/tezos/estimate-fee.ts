@@ -173,8 +173,8 @@ export const estimateAndReplaceLimitsAndFee = async (
   });
 
   const block: { chain_id: string } = await fetch(
-    `${nodeUrl}chains/main/blocks/head`,
-  ).then((x) => x.json());
+    `${nodeUrl}chains/main/blocks/head/header`,
+  ).then((res) => res.json());
   const body = {
     chain_id: block.chain_id,
     operation: {
@@ -195,7 +195,7 @@ export const estimateAndReplaceLimitsAndFee = async (
       body: JSON.stringify(body),
     },
   )
-    .then((x) => x.json())
+    .then((res) => res.json())
     .catch((runOperationError: Error) => {
       throw runOperationError;
     });
