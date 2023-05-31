@@ -5,7 +5,10 @@ import chaiBytes from 'chai-bytes';
 import * as sinon from 'sinon';
 import { jsonOk } from '../../test/utils.test';
 import { DEFAULT_NODE_URL } from '../constants';
-import { estimateAndReplaceLimitsAndFee } from './estimate-fee';
+import {
+  estimateAndReplaceLimitsAndFee,
+  sumUpInternalFees,
+} from './estimate-fee';
 import { TezosOperationType, TezosTransactionOperation } from './types';
 
 chai.use(chaiBytes);
@@ -126,5 +129,47 @@ describe('Test function: estimateFee', function () {
     expect(fetchStub.firstCall.args[0]).to.deep.equal(
       'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/helpers/scripts/run_operation',
     );
+  });
+
+  it('should sum up internal fees', async function () {
+    const fees = sumUpInternalFees({
+      balance_updates: [],
+      operation_result: {
+        status: 'ok',
+        balance_updates: [],
+        consumed_milligas: '1',
+      },
+      internal_operation_results: [
+        {
+          result: {
+            consumed_milligas: '2',
+            paid_storage_size_diff: '3',
+            originated_contracts: ['KT1...'],
+            allocated_destination_contract: true,
+          },
+        },
+      ],
+    });
+
+    expect(fees).to.deep.equal({
+      gasLimit: 1,
+      storageLimit: 517,
+    });
+  });
+
+  it('should throw an error if there is an internal error', async function () {
+    expect(() =>
+      sumUpInternalFees({
+        balance_updates: [],
+        operation_result: {
+          status: 'ok',
+          balance_updates: [],
+          consumed_milligas: '1',
+        },
+        internal_operation_results: [
+          { result: { errors: 'test', consumed_milligas: '2' } },
+        ],
+      }),
+    ).to.throw('An internal operation produced an error "test"');
   });
 });

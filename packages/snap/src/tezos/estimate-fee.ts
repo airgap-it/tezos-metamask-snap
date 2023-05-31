@@ -23,7 +23,7 @@ import {
   MINIMAL_FEE_PER_GAS_UNIT,
 } from './constants';
 
-const sumUpInternalFees = (metadata: RunOperationMetadata) => {
+export const sumUpInternalFees = (metadata: RunOperationMetadata) => {
   let gasLimit = 0;
   let storageLimit = 0;
 
