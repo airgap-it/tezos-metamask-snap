@@ -1,7 +1,7 @@
 import { panel, heading, text } from '@metamask/snaps-ui';
 import { DEFAULT_NODE_URL } from '../constants';
 
-export const tezosClearRpc = async (_params: any) => {
+export const tezosClearRpc = async () => {
   const approved = await snap.request({
     method: 'snap_dialog',
     params: {

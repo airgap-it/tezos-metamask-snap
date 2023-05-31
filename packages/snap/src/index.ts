@@ -52,7 +52,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return tezosSetRpc(params);
 
     case 'tezos_clearRpc':
-      return tezosClearRpc(params);
+      return tezosClearRpc();
 
     default:
       throw new Error('Method not found.');
