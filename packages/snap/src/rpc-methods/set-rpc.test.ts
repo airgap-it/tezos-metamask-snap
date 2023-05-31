@@ -85,4 +85,52 @@ describe('Test function: setRpc', function () {
     expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(0);
     expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(0);
   });
+
+  it('should not share the RPC if the user rejects the dialog', async function () {
+    const data = { network: 'mainnet', nodeUrl: 'https://test.com' };
+
+    snapStub.rpcStubs.snap_dialog.resolves(false);
+
+    const fetchStub = sinon
+      .stub(global, 'fetch')
+      .returns(jsonOk({ hash: 'op...', chain_id: 'testchain' }));
+
+    expect(tezosSetRpc(data)).to.be.rejectedWith('User rejected');
+
+    expect(fetchStub.callCount).to.be.equal(1, 'fetchStub');
+    expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(0);
+    expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(0);
+  });
+
+  it('should fail when fetching from invalid RPC url', async function () {
+    const data = { network: 'mainnet', nodeUrl: 'https://test.com' };
+
+    snapStub.rpcStubs.snap_dialog.resolves(false);
+
+    const fetchStub = sinon
+      .stub(global, 'fetch')
+      .returns(jsonOk({ test: '123' }));
+
+    expect(tezosSetRpc(data)).to.be.rejectedWith('Invalid RPC URL');
+
+    expect(fetchStub.callCount).to.be.equal(1, 'fetchStub');
+    expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(0);
+    expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(0);
+  });
+
+  it('should fail with invalid RPC url', async function () {
+    const data = { network: 'mainnet', nodeUrl: 'https://test.com' };
+
+    snapStub.rpcStubs.snap_dialog.resolves(false);
+
+    const fetchStub = sinon
+      .stub(global, 'fetch')
+      .rejects(new Error('Invalid RPC URL'));
+
+    expect(tezosSetRpc(data)).to.be.rejectedWith('Invalid RPC URL');
+
+    expect(fetchStub.callCount).to.be.equal(1, 'fetchStub');
+    expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(0);
+    expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(0);
+  });
 });

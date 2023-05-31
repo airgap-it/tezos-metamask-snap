@@ -1,5 +1,5 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { tezosGetAccount } from './rpc-methods/get-accounts';
+import { tezosGetAccount } from './rpc-methods/get-account';
 import { tezosSendOperation } from './rpc-methods/send-operation';
 import { tezosSignPayload } from './rpc-methods/sign-payload';
 import { tezosGetRpc } from './rpc-methods/get-rpc';

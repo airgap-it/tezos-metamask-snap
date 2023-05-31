@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import * as sinon from 'sinon';
 import { Json, JsonRpcRequest } from '@metamask/snaps-types';
-import * as getAccountMethods from './rpc-methods/get-accounts';
+import * as getAccountMethods from './rpc-methods/get-account';
 import * as sendOperationMethods from './rpc-methods/send-operation';
 import * as signPayloadMethods from './rpc-methods/sign-payload';
 import * as getRpcMethods from './rpc-methods/get-rpc';
