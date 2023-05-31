@@ -10,7 +10,7 @@ export const getBalanceOfAddress = async (
   try {
     const data = await fetch(
       `${nodeUrl}chains/main/blocks/head/context/contracts/${address}/balance`,
-    ).then((x) => x.json());
+    ).then((res) => res.json());
     balance = balance.plus(new BigNumber(data));
   } catch (error: any) {
     // if node returns 404 (which means 'no account found'), go with 0 balance
