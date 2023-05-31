@@ -5,15 +5,28 @@ import chaiBytes from 'chai-bytes';
 import * as sinon from 'sinon';
 import { jsonOk } from '../../test/utils.test';
 import { DEFAULT_NODE_URL } from '../constants';
-import { prepareOperations } from './prepare-operations';
-import { TezosOperationType, TezosTransactionOperation } from './types';
+import {
+  handleDelegationOperation,
+  handleOriginationOperation,
+  handleRevealOperation,
+  handleTransactionOperation,
+  prepareOperations,
+} from './prepare-operations';
+import {
+  TezosDelegationOperation,
+  TezosOperation,
+  TezosOperationType,
+  TezosOriginationOperation,
+  TezosRevealOperation,
+  TezosTransactionOperation,
+} from './types';
 import * as estimateFeeMethods from './estimate-fee';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('Test function: sendOperation', function () {
+describe('Test function: prepareOperations', function () {
   afterEach(function () {
     sinon.restore();
   });
@@ -78,5 +91,257 @@ describe('Test function: sendOperation', function () {
       'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
     );
     expect(feeStub.callCount).to.equal(1);
+  });
+
+  it('should return other operation types unmodified', async function () {
+    const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+    const blockHash = 'BLbfxzLVe4Wu25Wmz3MoDWp8c6HmEwKxfR3MC86FHiK12zNp4WK';
+
+    const fetchStub = sinon
+      .stub(global, 'fetch')
+      .withArgs(
+        `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/counter`,
+      )
+      .returns(jsonOk('13186806'))
+      .withArgs(`${DEFAULT_NODE_URL}chains/main/blocks/head~2/hash`)
+      .returns(jsonOk(blockHash))
+      .withArgs(
+        `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/manager_key`,
+      )
+      .returns(
+        jsonOk('edpkuwYWCugiYG7nMnVUdopFmyc3sbMSiLqsJHTQgGtVhtSdLSw6HG'),
+      );
+
+    const feeStub = sinon
+      .stub(estimateFeeMethods, 'estimateAndReplaceLimitsAndFee')
+      .returns(
+        Promise.resolve({
+          branch: 'BLbfxzLVe4Wu25Wmz3MoDWp8c6HmEwKxfR3MC86FHiK12zNp4WK',
+          contents: [
+            {
+              kind: TezosOperationType.BALLOT,
+              source: address,
+              period: 98,
+              proposal: 'PtNairobiyssHuh87hEhfVBGCVrK3WnS8Z2FT4ymB5tAa4r1nQf',
+              ballot: 'yay',
+            } as TezosOperation,
+          ],
+        }),
+      );
+
+    const response = await prepareOperations(
+      address,
+      'edpkuwYWCugiYG7nMnVUdopFmyc3sbMSiLqsJHTQgGtVhtSdLSw6HG',
+      [
+        {
+          kind: TezosOperationType.BALLOT,
+          source: address,
+          period: 98,
+          proposal: 'PtNairobiyssHuh87hEhfVBGCVrK3WnS8Z2FT4ymB5tAa4r1nQf',
+          ballot: 'yay',
+        } as TezosOperation,
+      ],
+      DEFAULT_NODE_URL,
+    );
+
+    expect(response).to.equal(
+      '74b00cb4900aba5612890c2e794955137e4291a14d79c43dd5803bb4085e4abd06005fd0a7ece135cecfd71fcf78cf6656d5047fb98000000062d9b8c2314cc05ffa3fc655a98bb87155be4cf7ce67fee6b594ea9302e8655df200',
+    );
+    expect(fetchStub.callCount).to.equal(1); // Why is this only 1?
+    expect(fetchStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
+    );
+    expect(feeStub.callCount).to.equal(1);
+  });
+
+  describe('Internal function: handleRevealOperation', function () {
+    it('should handle a reveal operation', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      const response = await handleRevealOperation(
+        {
+          kind: TezosOperationType.REVEAL,
+          public_key: 'edpk...',
+        } as TezosRevealOperation,
+        address,
+        '1',
+        '2',
+        '3',
+        '4',
+      );
+
+      expect(response).to.deep.equal({
+        kind: 'reveal',
+        public_key: 'edpk...',
+        source: 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3',
+        counter: '1',
+        fee: '2',
+        gas_limit: '3',
+        storage_limit: '4',
+      });
+    });
+
+    it('should reject a reveal operation without public_key', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      await expect(
+        handleRevealOperation(
+          {
+            kind: TezosOperationType.REVEAL,
+          } as TezosRevealOperation,
+          address,
+          '1',
+          '2',
+          '3',
+          '4',
+        ),
+      ).to.be.rejectedWith('property "public_key" was not defined');
+    });
+  });
+
+  describe('Internal function: handleDelegationOperation', function () {
+    it('should handle a delegate operation', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      const response = await handleDelegationOperation(
+        {
+          kind: TezosOperationType.DELEGATION,
+        } as TezosDelegationOperation,
+        address,
+        '1',
+        '2',
+        '3',
+        '4',
+      );
+
+      expect(response).to.deep.equal({
+        kind: 'delegation',
+        source: 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3',
+        counter: '1',
+        fee: '2',
+        gas_limit: '3',
+        storage_limit: '4',
+      });
+    });
+  });
+
+  describe('Internal function: handleTransactionOperation', function () {
+    it('should handle a transaction operation', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      const response = await handleTransactionOperation(
+        {
+          kind: TezosOperationType.TRANSACTION,
+          amount: '1',
+          destination: address,
+        } as TezosTransactionOperation,
+        address,
+        '1',
+        '2',
+      );
+
+      expect(response).to.deep.equal({
+        kind: 'transaction',
+        amount: '1',
+        destination: address,
+        source: 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3',
+        counter: '1',
+        fee: '2',
+        gas_limit: '1040000',
+        storage_limit: '60000',
+      });
+    });
+
+    it('should reject a transaction operation without amount', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      await expect(
+        handleTransactionOperation(
+          {
+            kind: TezosOperationType.TRANSACTION,
+            destination: address,
+          } as TezosTransactionOperation,
+          address,
+          '1',
+          '2',
+        ),
+      ).to.be.rejectedWith('property "amount" was not defined');
+    });
+
+    it('should reject a transaction operation without destination', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      await expect(
+        handleTransactionOperation(
+          {
+            kind: TezosOperationType.TRANSACTION,
+            amount: '1',
+          } as TezosTransactionOperation,
+          address,
+          '1',
+          '2',
+        ),
+      ).to.be.rejectedWith('property "destination" was not defined');
+    });
+  });
+
+  describe('Internal function: handleOriginationOperation', function () {
+    it('should handle a transaction operation', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      const response = await handleOriginationOperation(
+        {
+          kind: TezosOperationType.ORIGINATION,
+          balance: '1',
+          script: address,
+        } as TezosOriginationOperation,
+        address,
+        '1',
+        '2',
+      );
+
+      expect(response).to.deep.equal({
+        kind: 'origination',
+        balance: '1',
+        script: address,
+        source: 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3',
+        counter: '1',
+        fee: '2',
+        gas_limit: '1040000',
+        storage_limit: '60000',
+      });
+    });
+
+    it('should reject a transaction operation without balance', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      await expect(
+        handleOriginationOperation(
+          {
+            kind: TezosOperationType.ORIGINATION,
+            script: address,
+          } as TezosOriginationOperation,
+          address,
+          '1',
+          '2',
+        ),
+      ).to.be.rejectedWith('property "balance" was not defined');
+    });
+
+    it('should reject a transaction operation without script', async function () {
+      const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
+
+      await expect(
+        handleOriginationOperation(
+          {
+            kind: TezosOperationType.ORIGINATION,
+            balance: '1',
+          } as TezosOriginationOperation,
+          address,
+          '1',
+          '2',
+        ),
+      ).to.be.rejectedWith('property "script" was not defined');
+    });
   });
 });

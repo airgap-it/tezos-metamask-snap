@@ -29,7 +29,7 @@ export type TezosTransactionOperation = {
 } & TezosOperation;
 
 export type TezosOriginationOperation = {
-  kind: TezosOperationType.DELEGATION;
+  kind: TezosOperationType.ORIGINATION;
   source: string;
   fee: string;
   counter: string;

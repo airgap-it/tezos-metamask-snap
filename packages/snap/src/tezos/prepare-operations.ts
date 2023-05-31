@@ -17,7 +17,7 @@ import {
 import { estimateAndReplaceLimitsAndFee } from './estimate-fee';
 import { getBalanceOfAddress } from './get-balance-of-address';
 
-const handleRevealOperation = async (
+export const handleRevealOperation = async (
   operationRequest: TezosOperation,
   address: string,
   defaultCounter: string,
@@ -43,7 +43,7 @@ const handleRevealOperation = async (
   return revealOperation;
 };
 
-const handleDelegationOperation = async (
+export const handleDelegationOperation = async (
   operationRequest: TezosOperation,
   address: string,
   defaultCounter: string,
@@ -69,7 +69,7 @@ const handleDelegationOperation = async (
   return delegationOperation;
 };
 
-const handleTransactionOperation = async (
+export const handleTransactionOperation = async (
   operationRequest: TezosOperation,
   address: string,
   defaultCounter: string,
@@ -98,7 +98,7 @@ const handleTransactionOperation = async (
   return transactionOperation;
 };
 
-const handleOriginationOperation = async (
+export const handleOriginationOperation = async (
   operationRequest: TezosOperation,
   address: string,
   defaultCounter: string,

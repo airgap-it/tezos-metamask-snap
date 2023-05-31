@@ -26,7 +26,7 @@
     "serve": "mm-snap serve",
     "start": "mm-snap watch",
     "test": "yarn run test:unit && yarn run cover:report",
-    "test:unit": "nyc --check-coverage --statements 70 --branches 40 --functions 70 --lines 70 mocha --colors -r ts-node/register -r jsdom-global/register \"**/*.test.ts\""
+    "test:unit": "nyc --check-coverage --statements 90 --branches 70 --functions 90 --lines 90 mocha --colors -r ts-node/register -r jsdom-global/register \"**/*.test.ts\""
   },
   "dependencies": {
     "@taquito/local-forging": "^15.1.0",
