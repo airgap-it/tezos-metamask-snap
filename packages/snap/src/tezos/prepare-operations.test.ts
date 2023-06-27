@@ -21,6 +21,7 @@ import {
   TezosTransactionOperation,
 } from './types';
 import * as estimateFeeMethods from './estimate-fee';
+import * as getBalanceMethods from './get-balance-of-address';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);
@@ -35,20 +36,29 @@ describe('Test function: prepareOperations', function () {
     const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
     const blockHash = 'BLbfxzLVe4Wu25Wmz3MoDWp8c6HmEwKxfR3MC86FHiK12zNp4WK';
 
-    const fetchStub = sinon
-      .stub(global, 'fetch')
+    const fetchStub = sinon.stub(global, 'fetch');
+
+    const fetchCounterStub = fetchStub
       .withArgs(
         `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/counter`,
       )
-      .returns(jsonOk('13186806'))
+      .returns(jsonOk('13186806'));
+
+    const fetchHeadStub = fetchStub
       .withArgs(`${DEFAULT_NODE_URL}chains/main/blocks/head~2/hash`)
-      .returns(jsonOk(blockHash))
+      .returns(jsonOk(blockHash));
+
+    const fetchManagerStub = fetchStub
       .withArgs(
         `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/manager_key`,
       )
       .returns(
         jsonOk('edpkuwYWCugiYG7nMnVUdopFmyc3sbMSiLqsJHTQgGtVhtSdLSw6HG'),
       );
+
+    const balanceStub = sinon
+      .stub(getBalanceMethods, 'getBalanceOfAddress')
+      .returns(Promise.resolve('1000'));
 
     const feeStub = sinon
       .stub(estimateFeeMethods, 'estimateAndReplaceLimitsAndFee')
@@ -86,31 +96,58 @@ describe('Test function: prepareOperations', function () {
     expect(response).to.equal(
       '74b00cb4900aba5612890c2e794955137e4291a14d79c43dd5803bb4085e4abd6c005fd0a7ece135cecfd71fcf78cf6656d5047fb980c603f7eda406e907000100005fd0a7ece135cecfd71fcf78cf6656d5047fb98000',
     );
-    expect(fetchStub.callCount).to.equal(1); // Why is this only 1?
-    expect(fetchStub.firstCall.args[0]).to.deep.equal(
-      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
+
+    expect(fetchStub.callCount).to.equal(3);
+
+    expect(fetchCounterStub.callCount).to.equal(1);
+    expect(fetchCounterStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/counter',
+      'fetchCounterStub',
     );
+
+    expect(fetchHeadStub.callCount).to.equal(1);
+    expect(fetchHeadStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head~2/hash',
+      'fetchHeadStub',
+    );
+
+    expect(fetchManagerStub.callCount).to.equal(1);
+    expect(fetchManagerStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
+      'fetchManagerStub',
+    );
+
     expect(feeStub.callCount).to.equal(1);
+    expect(balanceStub.callCount).to.equal(1);
   });
 
   it('should return other operation types unmodified', async function () {
     const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
     const blockHash = 'BLbfxzLVe4Wu25Wmz3MoDWp8c6HmEwKxfR3MC86FHiK12zNp4WK';
 
-    const fetchStub = sinon
-      .stub(global, 'fetch')
+    const fetchStub = sinon.stub(global, 'fetch');
+
+    const fetchCounterStub = fetchStub
       .withArgs(
         `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/counter`,
       )
-      .returns(jsonOk('13186806'))
+      .returns(jsonOk('13186806'));
+
+    const fetchHeadStub = fetchStub
       .withArgs(`${DEFAULT_NODE_URL}chains/main/blocks/head~2/hash`)
-      .returns(jsonOk(blockHash))
+      .returns(jsonOk(blockHash));
+
+    const fetchManagerStub = fetchStub
       .withArgs(
         `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/manager_key`,
       )
       .returns(
         jsonOk('edpkuwYWCugiYG7nMnVUdopFmyc3sbMSiLqsJHTQgGtVhtSdLSw6HG'),
       );
+
+    const balanceStub = sinon
+      .stub(getBalanceMethods, 'getBalanceOfAddress')
+      .returns(Promise.resolve('1000'));
 
     const feeStub = sinon
       .stub(estimateFeeMethods, 'estimateAndReplaceLimitsAndFee')
@@ -147,11 +184,29 @@ describe('Test function: prepareOperations', function () {
     expect(response).to.equal(
       '74b00cb4900aba5612890c2e794955137e4291a14d79c43dd5803bb4085e4abd06005fd0a7ece135cecfd71fcf78cf6656d5047fb98000000062d9b8c2314cc05ffa3fc655a98bb87155be4cf7ce67fee6b594ea9302e8655df200',
     );
-    expect(fetchStub.callCount).to.equal(1); // Why is this only 1?
-    expect(fetchStub.firstCall.args[0]).to.deep.equal(
-      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
+
+    expect(fetchStub.callCount).to.equal(3);
+
+    expect(fetchCounterStub.callCount).to.equal(1);
+    expect(fetchCounterStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/counter',
+      'fetchCounterStub',
     );
+
+    expect(fetchHeadStub.callCount).to.equal(1);
+    expect(fetchHeadStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head~2/hash',
+      'fetchHeadStub',
+    );
+
+    expect(fetchManagerStub.callCount).to.equal(1);
+    expect(fetchManagerStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
+      'fetchManagerStub',
+    );
+
     expect(feeStub.callCount).to.equal(1);
+    expect(balanceStub.callCount).to.equal(0);
   });
 
   describe('Internal function: handleRevealOperation', function () {
