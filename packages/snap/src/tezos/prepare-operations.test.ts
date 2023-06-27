@@ -27,6 +27,38 @@ chai.use(chaiBytes);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
+const setupFetchStubs = (address: string, blockHash: string) => {
+  const fetchStub = sinon.stub(global, 'fetch');
+
+  const fetchCounterStub = fetchStub
+    .withArgs(
+      `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/counter`,
+    )
+    .returns(jsonOk('13186806'));
+
+  const fetchHeadStub = fetchStub
+    .withArgs(`${DEFAULT_NODE_URL}chains/main/blocks/head~2/hash`)
+    .returns(jsonOk(blockHash));
+
+  const fetchManagerStub = fetchStub
+    .withArgs(
+      `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/manager_key`,
+    )
+    .returns(jsonOk('edpkuwYWCugiYG7nMnVUdopFmyc3sbMSiLqsJHTQgGtVhtSdLSw6HG'));
+
+  const balanceStub = sinon
+    .stub(getBalanceMethods, 'getBalanceOfAddress')
+    .returns(Promise.resolve('1000'));
+
+  return {
+    fetchStub,
+    fetchCounterStub,
+    fetchHeadStub,
+    fetchManagerStub,
+    balanceStub,
+  };
+};
+
 describe('Test function: prepareOperations', function () {
   afterEach(function () {
     sinon.restore();
@@ -36,29 +68,13 @@ describe('Test function: prepareOperations', function () {
     const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
     const blockHash = 'BLbfxzLVe4Wu25Wmz3MoDWp8c6HmEwKxfR3MC86FHiK12zNp4WK';
 
-    const fetchStub = sinon.stub(global, 'fetch');
-
-    const fetchCounterStub = fetchStub
-      .withArgs(
-        `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/counter`,
-      )
-      .returns(jsonOk('13186806'));
-
-    const fetchHeadStub = fetchStub
-      .withArgs(`${DEFAULT_NODE_URL}chains/main/blocks/head~2/hash`)
-      .returns(jsonOk(blockHash));
-
-    const fetchManagerStub = fetchStub
-      .withArgs(
-        `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/manager_key`,
-      )
-      .returns(
-        jsonOk('edpkuwYWCugiYG7nMnVUdopFmyc3sbMSiLqsJHTQgGtVhtSdLSw6HG'),
-      );
-
-    const balanceStub = sinon
-      .stub(getBalanceMethods, 'getBalanceOfAddress')
-      .returns(Promise.resolve('1000'));
+    const {
+      fetchStub,
+      fetchCounterStub,
+      fetchHeadStub,
+      fetchManagerStub,
+      balanceStub,
+    } = setupFetchStubs(address, blockHash);
 
     const feeStub = sinon
       .stub(estimateFeeMethods, 'estimateAndReplaceLimitsAndFee')
@@ -125,29 +141,13 @@ describe('Test function: prepareOperations', function () {
     const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
     const blockHash = 'BLbfxzLVe4Wu25Wmz3MoDWp8c6HmEwKxfR3MC86FHiK12zNp4WK';
 
-    const fetchStub = sinon.stub(global, 'fetch');
-
-    const fetchCounterStub = fetchStub
-      .withArgs(
-        `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/counter`,
-      )
-      .returns(jsonOk('13186806'));
-
-    const fetchHeadStub = fetchStub
-      .withArgs(`${DEFAULT_NODE_URL}chains/main/blocks/head~2/hash`)
-      .returns(jsonOk(blockHash));
-
-    const fetchManagerStub = fetchStub
-      .withArgs(
-        `${DEFAULT_NODE_URL}chains/main/blocks/head/context/contracts/${address}/manager_key`,
-      )
-      .returns(
-        jsonOk('edpkuwYWCugiYG7nMnVUdopFmyc3sbMSiLqsJHTQgGtVhtSdLSw6HG'),
-      );
-
-    const balanceStub = sinon
-      .stub(getBalanceMethods, 'getBalanceOfAddress')
-      .returns(Promise.resolve('1000'));
+    const {
+      fetchStub,
+      fetchCounterStub,
+      fetchHeadStub,
+      fetchManagerStub,
+      balanceStub,
+    } = setupFetchStubs(address, blockHash);
 
     const feeStub = sinon
       .stub(estimateFeeMethods, 'estimateAndReplaceLimitsAndFee')
