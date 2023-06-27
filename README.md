@@ -1,10 +1,9 @@
 # tezos-metamask-snap
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=airgap-it_tezos-metamask-snap&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=airgap-it_tezos-metamask-snap)
+[![Known Vulnerabilities](https://snyk.io/test/github/airgap-it/tezos-metamask-snap/badge.svg)]
 
 This snap adds Tezos support to MetaMask.
-
-WARNING: This is an early prototype. Any contributions are welcome.
 
 ## Setup
 
@@ -18,9 +17,7 @@ Visit http://localhost:8000 to open the demo dApp to connect to MetaMask Flask. 
 
 ## TODO:
 
-- [ ] Add Unit Tests
-- [ ] Clean up code
-- [ ] Investigate Beacon compatibility to make compatible with existing Tezos dApps
+- [ ] Investigate [Beacon](https://walletbeacon.io) compatibility to make compatible with existing Tezos dApps
 
 # Original Readme
 
