@@ -11,7 +11,7 @@ chai.use(chaiBytes);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-const setupStubs = (
+const checkStubs = (
   response: {
     network: string;
     nodeUrl: string;
@@ -32,6 +32,16 @@ const setupStubs = (
   expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(1);
 };
 
+const setupStubs = (snapStub: SnapMock) => {
+  snapStub.rpcStubs.snap_dialog.resolves(true);
+  snapStub.rpcStubs.snap_manageState.resolves();
+  const fetchStub = sinon
+    .stub(global, 'fetch')
+    .returns(jsonOk({ hash: 'op...', chain_id: 'testchain' }));
+
+  return { fetchStub };
+};
+
 describe('Test function: setRpc', function () {
   const snapStub = new SnapMock();
 
@@ -46,15 +56,11 @@ describe('Test function: setRpc', function () {
 
   it('should set a valid RPC', async function () {
     const data = { network: 'mainnet', nodeUrl: 'https://test.com/' };
-    snapStub.rpcStubs.snap_dialog.resolves(true);
-    snapStub.rpcStubs.snap_manageState.resolves();
-    const fetchStub = sinon
-      .stub(global, 'fetch')
-      .returns(jsonOk({ hash: 'op...', chain_id: 'testchain' }));
+    const { fetchStub } = setupStubs(snapStub);
 
     const response = await tezosSetRpc(data);
 
-    setupStubs(response, data, fetchStub, snapStub);
+    checkStubs(response, data, fetchStub, snapStub);
 
     expect(snapStub.rpcStubs.snap_manageState.firstCall.args[0]).to.deep.equal({
       operation: 'update',
@@ -64,15 +70,11 @@ describe('Test function: setRpc', function () {
 
   it('should set a valid RPC and normalize the URL', async function () {
     const data = { network: 'mainnet', nodeUrl: 'https://test.com' };
-    snapStub.rpcStubs.snap_dialog.resolves(true);
-    snapStub.rpcStubs.snap_manageState.resolves();
-    const fetchStub = sinon
-      .stub(global, 'fetch')
-      .returns(jsonOk({ hash: 'op...', chain_id: 'testchain' }));
+    const { fetchStub } = setupStubs(snapStub);
 
     const response = await tezosSetRpc(data);
 
-    setupStubs(response, data, fetchStub, snapStub);
+    checkStubs(response, data, fetchStub, snapStub);
 
     expect(snapStub.rpcStubs.snap_manageState.firstCall.args[0]).to.deep.equal({
       operation: 'update',
