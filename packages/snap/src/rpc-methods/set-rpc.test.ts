@@ -11,6 +11,27 @@ chai.use(chaiBytes);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
+const setupStubs = (
+  response: {
+    network: string;
+    nodeUrl: string;
+  },
+  data: {
+    network: string;
+    nodeUrl: string;
+  },
+  fetchStub: sinon.SinonStub,
+  snapStub: SnapMock,
+) => {
+  expect(response).to.deep.equal(data);
+  expect(fetchStub.callCount).to.be.equal(1);
+  expect(fetchStub.firstCall.args[0]).to.be.equal(
+    `${data.nodeUrl}chains/main/blocks/head/header`,
+  );
+  expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(1);
+  expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(1);
+};
+
 describe('Test function: setRpc', function () {
   const snapStub = new SnapMock();
 
@@ -33,13 +54,8 @@ describe('Test function: setRpc', function () {
 
     const response = await tezosSetRpc(data);
 
-    expect(response).to.deep.equal(data);
-    expect(fetchStub.callCount).to.be.equal(1);
-    expect(fetchStub.firstCall.args[0]).to.be.equal(
-      `${data.nodeUrl}chains/main/blocks/head/header`,
-    );
-    expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(1);
-    expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(1);
+    setupStubs(response, data, fetchStub, snapStub);
+
     expect(snapStub.rpcStubs.snap_manageState.firstCall.args[0]).to.deep.equal({
       operation: 'update',
       newState: { rpc: data },
@@ -56,13 +72,8 @@ describe('Test function: setRpc', function () {
 
     const response = await tezosSetRpc(data);
 
-    expect(response).to.deep.equal(data);
-    expect(fetchStub.callCount).to.be.equal(1);
-    expect(fetchStub.firstCall.args[0]).to.be.equal(
-      `${data.nodeUrl}/chains/main/blocks/head/header`,
-    );
-    expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(1);
-    expect(snapStub.rpcStubs.snap_manageState.callCount).to.be.equal(1);
+    setupStubs(response, data, fetchStub, snapStub);
+
     expect(snapStub.rpcStubs.snap_manageState.firstCall.args[0]).to.deep.equal({
       operation: 'update',
       newState: { rpc: { ...data, nodeUrl: `${data.nodeUrl}/` } },
