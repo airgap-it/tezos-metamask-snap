@@ -24,8 +24,9 @@ describe('Test function: estimateFee', function () {
     const address = 'tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3';
     const blockHash = 'BLbfxzLVe4Wu25Wmz3MoDWp8c6HmEwKxfR3MC86FHiK12zNp4WK';
 
-    const fetchStub = sinon
-      .stub(global, 'fetch')
+    const fetchStub = sinon.stub(global, 'fetch');
+
+    const fetchHeaderStub = fetchStub
       .withArgs(`${DEFAULT_NODE_URL}chains/main/blocks/head/header`)
       .returns(
         jsonOk({
@@ -48,7 +49,9 @@ describe('Test function: estimateFee', function () {
           signature:
             'sigYGVjZwn5yJ3SxYWEWNbvWj2RMDjAbQc9xba3hiVgUcLY8gyzvDUHb79ywewfnWnUNb8SRMsq32xopkmNi4miq4ST3ZzDF',
         }),
-      )
+      );
+
+    const fetchOperationStub = fetchStub
       .withArgs(
         `${DEFAULT_NODE_URL}chains/main/blocks/head/helpers/scripts/run_operation`,
       )
@@ -125,8 +128,14 @@ describe('Test function: estimateFee', function () {
         } as TezosTransactionOperation,
       ],
     });
-    expect(fetchStub.callCount).to.equal(1); // Why is this only 1?
-    expect(fetchStub.firstCall.args[0]).to.deep.equal(
+
+    expect(fetchStub.callCount).to.equal(2, 'fetchStub');
+    expect(fetchHeaderStub.callCount).to.equal(1, 'fetchHeaderStub');
+    expect(fetchHeaderStub.firstCall.args[0]).to.deep.equal(
+      'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/header',
+    );
+    expect(fetchOperationStub.callCount).to.equal(1, 'fetchOperationStub');
+    expect(fetchOperationStub.firstCall.args[0]).to.deep.equal(
       'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/helpers/scripts/run_operation',
     );
   });
