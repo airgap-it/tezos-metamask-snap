@@ -21,6 +21,11 @@ import {
   MINIMAL_FEE,
   MINIMAL_FEE_PER_BYTE,
   MINIMAL_FEE_PER_GAS_UNIT,
+  ALLOCATION_BURN,
+  ORIGINATION_BURN,
+  GAS_TO_MILLIGAS_MULTIPLIER,
+  HEX_SIG_LENGTH,
+  FEE_SAFETY_DEFAULT,
 } from './constants';
 
 export const sumUpInternalFees = (metadata: RunOperationMetadata) => {
@@ -47,7 +52,8 @@ export const sumUpInternalFees = (metadata: RunOperationMetadata) => {
         }
 
         gasLimit += Math.ceil(
-          Number(internalOperation.result.consumed_milligas) / 1000,
+          Number(internalOperation.result.consumed_milligas) /
+            GAS_TO_MILLIGAS_MULTIPLIER,
         );
 
         if (internalOperation.result.paid_storage_size_diff) {
@@ -58,11 +64,12 @@ export const sumUpInternalFees = (metadata: RunOperationMetadata) => {
 
         if (internalOperation.result.originated_contracts) {
           storageLimit +=
-            internalOperation.result.originated_contracts.length * 257;
+            internalOperation.result.originated_contracts.length *
+            ORIGINATION_BURN;
         }
 
         if (internalOperation.result.allocated_destination_contract) {
-          storageLimit += 257;
+          storageLimit += ALLOCATION_BURN;
         }
       }
     },
@@ -101,18 +108,20 @@ const sumUpFees = async (
       let { gasLimit, storageLimit } = sumUpInternalFees(metadata);
 
       // Add gas and storage used by operation
-      gasLimit += Math.ceil(Number(result.consumed_milligas) / 1000);
+      gasLimit += Math.ceil(
+        Number(result.consumed_milligas) / GAS_TO_MILLIGAS_MULTIPLIER,
+      );
 
       if (result.paid_storage_size_diff) {
         storageLimit += Number(result.paid_storage_size_diff);
       }
 
       if (result.originated_contracts) {
-        storageLimit += result.originated_contracts.length * 257;
+        storageLimit += result.originated_contracts.length * ORIGINATION_BURN;
       }
 
       if (result.allocated_destination_contract) {
-        storageLimit += 257;
+        storageLimit += ALLOCATION_BURN;
       }
 
       if (
@@ -141,6 +150,7 @@ export const estimateAndReplaceLimitsAndFee = async (
   overrideParameters = true,
   startingCounter?: BigNumber,
 ): Promise<TezosWrappedOperation> => {
+  // Simulation requires a signature, but it doesn't have to be valid.
   const fakeSignature =
     'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP';
   const opKinds = [
@@ -220,9 +230,13 @@ export const estimateAndReplaceLimitsAndFee = async (
   ) {
     const fee: number =
       MINIMAL_FEE +
-      MINIMAL_FEE_PER_BYTE * Math.ceil((forgedOperation.length + 128) / 2) + // 128 is the length of a hex signature
+      MINIMAL_FEE_PER_BYTE *
+        Math.ceil(
+          (forgedOperation.length + HEX_SIG_LENGTH) /
+            2 /** Characters to bytes */,
+        ) +
       MINIMAL_FEE_PER_GAS_UNIT * gasLimitTotal +
-      100; // add 100 for safety
+      FEE_SAFETY_DEFAULT;
 
     const nonRevealOperations = tezosWrappedOperation.contents.filter(
       (operation) => operation.kind !== 'reveal',

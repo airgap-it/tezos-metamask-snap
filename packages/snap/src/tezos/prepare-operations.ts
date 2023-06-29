@@ -10,6 +10,8 @@ import {
   TezosOperation,
 } from './types';
 import {
+  ALLOCATION_STORAGE_LIMIT,
+  DEFAULT_GAS_LIMIT,
   FEE_PLACEHOLDER,
   GAS_LIMIT_PLACEHOLDER,
   STORAGE_LIMIT_PLACEHOLDER,
@@ -188,12 +190,12 @@ export const prepareOperations = async (
 
       const defaultCounter: string = counter.plus(index).toFixed();
       const defaultFee: string = FEE_PLACEHOLDER;
-      const defaultGasLimit = '10300';
+      const defaultGasLimit = DEFAULT_GAS_LIMIT;
       const defaultStorageLimit: string =
         receivingBalance?.isZero() &&
         recipient &&
         recipient.toLowerCase().startsWith('tz')
-          ? '300'
+          ? ALLOCATION_STORAGE_LIMIT
           : '0'; // taken from eztz
 
       switch (operationRequest.kind) {
