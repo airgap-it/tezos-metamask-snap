@@ -1,13 +1,13 @@
 {
-  "version": "1.0.0",
-  "description": "Tezos Snap",
-  "proposedName": "tezos-metamask-snap",
+  "version": "1.0.1",
+  "description": "Tezos Wallet for MetaMask",
+  "proposedName": "Tezos Wallet",
   "repository": {
     "type": "git",
     "url": "https://github.com/airgap-it/tezos-metamask-snap.git"
   },
   "source": {
-    "shasum": "U3pVkLc5j9HljoV77fGsWbHmjupzFcBqMDu99NKJcyI=",
+    "shasum": "gZ8KD6mLrT9pHe/Lw3RBxFGg5d3ilAUFmEgAenZ5F/s=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
