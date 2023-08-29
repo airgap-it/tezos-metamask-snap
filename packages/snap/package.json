@@ -1,7 +1,7 @@
 {
   "name": "tezos-metamask-snap",
-  "version": "1.0.0",
-  "description": "Tezos Snap for MetaMask",
+  "version": "1.0.1",
+  "description": "Tezos Wallet for MetaMask",
   "repository": {
     "type": "git",
     "url": "https://github.com/airgap-it/tezos-metamask-snap.git"
