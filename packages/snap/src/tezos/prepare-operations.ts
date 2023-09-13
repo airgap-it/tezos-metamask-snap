@@ -1,5 +1,11 @@
 import { localForger } from '@taquito/local-forging';
 import BigNumber from 'bignumber.js';
+import {
+  NETWORK_ERROR,
+  PROPERTY_NOT_DEFINED_ERROR,
+  PROPERTY_NOT_DEFINED_WITH_DATA_ERROR,
+  UNSUPPORTED_OPERATION_KIND_ERROR,
+} from '../utils/errors';
 import { createRevealOperation } from './create-reveal-operation';
 import {
   TezosOperationType,
@@ -31,7 +37,7 @@ export const handleRevealOperation = async (
     operationRequest as TezosRevealOperation;
 
   if (!revealOperation.public_key) {
-    throw new Error('property "public_key" was not defined');
+    throw PROPERTY_NOT_DEFINED_ERROR('public_key');
   }
 
   revealOperation.source = revealOperation.source ?? address;
@@ -81,11 +87,11 @@ export const handleTransactionOperation = async (
     operationRequest as TezosTransactionOperation;
 
   if (!transactionOperation.amount) {
-    throw new Error('property "amount" was not defined');
+    throw PROPERTY_NOT_DEFINED_ERROR('amount');
   }
 
   if (!transactionOperation.destination) {
-    throw new Error('property "destination" was not defined');
+    throw PROPERTY_NOT_DEFINED_ERROR('destination');
   }
 
   transactionOperation.source = transactionOperation.source ?? address;
@@ -110,11 +116,11 @@ export const handleOriginationOperation = async (
     operationRequest as TezosOriginationOperation;
 
   if (!originationOperation.balance) {
-    throw new Error('property "balance" was not defined');
+    throw PROPERTY_NOT_DEFINED_ERROR('balance');
   }
 
   if (!originationOperation.script) {
-    throw new Error('property "script" was not defined');
+    throw PROPERTY_NOT_DEFINED_ERROR('script');
   }
 
   originationOperation.source = originationOperation.source ?? address;
@@ -150,7 +156,7 @@ export const prepareOperations = async (
           `${nodeUrl}chains/main/blocks/head/context/contracts/${address}/manager_key`,
         ),
       ]).catch((error) => {
-        throw new Error(error);
+        throw NETWORK_ERROR(error);
       })
     ).map((res) => res.json()),
   );
@@ -173,9 +179,7 @@ export const prepareOperations = async (
   const operationPromises: Promise<TezosOperation>[] = operationRequests.map(
     async (operationRequest: TezosOperation, index: number) => {
       if (!operationRequest.kind) {
-        throw new Error(
-          `property "kind" was not defined ${JSON.stringify(operationRequest)}`,
-        );
+        throw PROPERTY_NOT_DEFINED_WITH_DATA_ERROR('kind', operationRequest);
       }
 
       const recipient: string | undefined = (
@@ -245,11 +249,7 @@ export const prepareOperations = async (
           // Do not change anything
           return operationRequest;
         default:
-          throw new Error(
-            `unsupported operation type "${JSON.stringify(
-              operationRequest.kind,
-            )}"`,
-          );
+          throw UNSUPPORTED_OPERATION_KIND_ERROR(operationRequest.kind);
       }
     },
   );

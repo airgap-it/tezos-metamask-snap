@@ -1,5 +1,6 @@
 import { panel, heading, text } from '@metamask/snaps-ui';
 import { DEFAULT_NODE_URL } from '../constants';
+import { USER_REJECTED_ERROR } from '../utils/errors';
 
 export const tezosClearRpc = async () => {
   const approved = await snap.request({
@@ -16,7 +17,7 @@ export const tezosClearRpc = async () => {
   });
 
   if (!approved) {
-    throw new Error('User rejected');
+    throw USER_REJECTED_ERROR();
   }
 
   await snap.request({

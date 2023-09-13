@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { FETCH_BALANCE_ERROR } from '../utils/errors';
 
 export const getBalanceOfAddress = async (
   address: string,
@@ -15,7 +16,7 @@ export const getBalanceOfAddress = async (
   } catch (error: any) {
     // if node returns 404 (which means 'no account found'), go with 0 balance
     if (error.response && error.response.status !== 404) {
-      throw new Error('Error fetching balance');
+      throw FETCH_BALANCE_ERROR();
     }
   }
 

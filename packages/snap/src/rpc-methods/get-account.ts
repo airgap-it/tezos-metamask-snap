@@ -1,6 +1,7 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getSigner } from '../utils/get-signer';
 import { getWallet } from '../utils/get-wallet';
+import { USER_REJECTED_ERROR } from '../utils/errors';
 
 export const tezosGetAccount = async (origin: string) => {
   const wallet = await getWallet();
@@ -26,7 +27,7 @@ export const tezosGetAccount = async (origin: string) => {
   });
 
   if (!approved) {
-    throw new Error('User rejected');
+    throw USER_REJECTED_ERROR();
   }
 
   return {

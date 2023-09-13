@@ -1,11 +1,17 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { SnapStorage } from '../types';
+import {
+  RPC_NO_HTTPS_ERROR,
+  RPC_INVALID_URL_ERROR,
+  RPC_INVALID_RESPONSE_ERROR,
+  USER_REJECTED_ERROR,
+} from '../utils/errors';
 
 export const tezosSetRpc = async (params: any) => {
   const { network, nodeUrl }: { network: string; nodeUrl: string } = params;
 
   if (!nodeUrl.startsWith('https://')) {
-    throw new Error('RPC URL needs to start with https://');
+    throw RPC_NO_HTTPS_ERROR();
   }
 
   const normalisedNodeUrl = `${nodeUrl}${nodeUrl.endsWith('/') ? '' : '/'}`;
@@ -15,11 +21,11 @@ export const tezosSetRpc = async (params: any) => {
   )
     .then((res) => res.json())
     .catch(() => {
-      throw new Error('Invalid RPC URL');
+      throw RPC_INVALID_URL_ERROR();
     });
 
   if (!header.hash || !header.chain_id) {
-    throw new Error('Invalid RPC response');
+    throw RPC_INVALID_RESPONSE_ERROR();
   }
 
   const approved = await snap.request({
@@ -37,7 +43,7 @@ export const tezosSetRpc = async (params: any) => {
   });
 
   if (!approved) {
-    throw new Error('User rejected');
+    throw USER_REJECTED_ERROR();
   }
 
   const newState: SnapStorage = {

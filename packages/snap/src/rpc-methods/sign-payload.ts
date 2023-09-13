@@ -1,6 +1,7 @@
 import { copyable, heading, panel, text } from '@metamask/snaps-ui';
 import { getWallet } from '../utils/get-wallet';
 import { sign } from '../utils/sign';
+import { USER_REJECTED_ERROR } from '../utils/errors';
 
 export const tezosSignPayload = async (params: any) => {
   const { payload } = params;
@@ -19,7 +20,7 @@ export const tezosSignPayload = async (params: any) => {
   });
 
   if (!approved) {
-    throw new Error('User rejected');
+    throw USER_REJECTED_ERROR();
   }
 
   return sign(payload, undefined, wallet);

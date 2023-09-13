@@ -1,5 +1,6 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getRpc } from '../utils/get-rpc';
+import { USER_REJECTED_ERROR } from '../utils/errors';
 
 export const tezosGetRpc = async () => {
   const rpc = await getRpc();
@@ -21,7 +22,7 @@ export const tezosGetRpc = async () => {
   });
 
   if (!approved) {
-    throw new Error('User rejected');
+    throw USER_REJECTED_ERROR();
   }
 
   return {
