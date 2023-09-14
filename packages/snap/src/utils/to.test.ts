@@ -10,15 +10,13 @@ chai.use(chaiAsPromised);
 
 describe('Test method: to', function () {
   it('should handle handle resolve', async function () {
-    const [err, res] = await to(new Promise((resolve) => resolve('test')));
+    const [err, res] = await to(Promise.resolve('test'));
     expect(err).to.equal(null);
     expect(res).to.contain('test');
   });
 
   it('should handle reject', async function () {
-    const [err, res] = await to(
-      new Promise((_resolve, reject) => reject(new Error('test'))),
-    );
+    const [err, res] = await to(Promise.reject(new Error('test')));
     expect(err?.message).to.equal('test');
     expect(res).to.equal(undefined);
   });
