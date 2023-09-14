@@ -41,19 +41,19 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return tezosGetAccount(origin);
 
     case 'tezos_sendOperation':
-      return tezosSendOperation(params);
+      return tezosSendOperation(origin, params);
 
     case 'tezos_signPayload':
-      return tezosSignPayload(params);
+      return tezosSignPayload(origin, params);
 
     case 'tezos_getRpc':
-      return tezosGetRpc();
+      return tezosGetRpc(origin);
 
     case 'tezos_setRpc':
-      return tezosSetRpc(params);
+      return tezosSetRpc(origin, params);
 
     case 'tezos_clearRpc':
-      return tezosClearRpc();
+      return tezosClearRpc(origin);
 
     default:
       throw METHOD_NOT_FOUND_ERROR();

@@ -28,7 +28,7 @@ describe('Test function: getRpc', function () {
 
     snapStub.rpcStubs.snap_dialog.resolves(true);
 
-    const response = await tezosGetRpc();
+    const response = await tezosGetRpc('http://localhost:1234');
 
     expect(response.network).to.equal(data.network);
     expect(response.nodeUrl).to.equal(data.nodeUrl);
@@ -43,6 +43,8 @@ describe('Test function: getRpc', function () {
 
     snapStub.rpcStubs.snap_dialog.resolves(false);
 
-    await expect(tezosGetRpc()).to.be.rejectedWith('User rejected');
+    await expect(tezosGetRpc('http://localhost:1234')).to.be.rejectedWith(
+      'User rejected',
+    );
   });
 });
