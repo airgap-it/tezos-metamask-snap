@@ -7,7 +7,7 @@
     "url": "https://github.com/airgap-it/tezos-metamask-snap.git"
   },
   "source": {
-    "shasum": "5GM/M6LN7+kw3X5o6haD0TTtskJEigc6PR26KcTWicw=",
+    "shasum": "SfXyr9LaibY8HwzSGrBgpfSxZ2lsTin01dLKk4tefLQ=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -22,7 +22,13 @@
     "snap_manageState": {},
     "snap_getBip32Entropy": [
       {
-        "path": ["m", "44'", "1729'", "0'", "0'"],
+        "path": [
+          "m",
+          "44'",
+          "1729'",
+          "0'",
+          "0'"
+        ],
         "curve": "ed25519"
       }
     ],
