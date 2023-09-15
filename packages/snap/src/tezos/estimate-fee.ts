@@ -1,6 +1,11 @@
 import { localForger } from '@taquito/local-forging';
 import BigNumber from 'bignumber.js';
 import {
+  TEZOS_INTERNAL_ERROR,
+  TEZOS_INTERNAL_OP_COUNT_MISMATCH_ERROR,
+  TEZOS_OPERATION_ERROR,
+} from '../utils/errors';
+import {
   TezosWrappedOperation,
   TezosOperationType,
   TezosTransactionOperation,
@@ -44,11 +49,7 @@ export const sumUpInternalFees = (metadata: RunOperationMetadata) => {
     (internalOperation: RunOperationInternalOperationResult) => {
       if (internalOperation?.result) {
         if (internalOperation.result.errors) {
-          throw new Error(
-            `An internal operation produced an error ${JSON.stringify(
-              internalOperation.result.errors,
-            )}`,
-          );
+          throw TEZOS_INTERNAL_ERROR(internalOperation.result.errors);
         }
 
         gasLimit += Math.ceil(
@@ -100,9 +101,7 @@ const sumUpFees = async (
       const result: RunOperationOperationResult = metadata.operation_result;
 
       if (result.errors) {
-        throw new Error(
-          `The operation produced an error ${JSON.stringify(result.errors)}`,
-        );
+        throw TEZOS_OPERATION_ERROR(result.errors);
       }
 
       let { gasLimit, storageLimit } = sumUpInternalFees(metadata);
@@ -211,8 +210,9 @@ export const estimateAndReplaceLimitsAndFee = async (
     });
 
   if (tezosWrappedOperation.contents.length !== response.contents.length) {
-    throw new Error(
-      `Run Operation did not return same number of operations. Locally we have ${tezosWrappedOperation.contents.length}, but got back ${response.contents.length}`,
+    throw TEZOS_INTERNAL_OP_COUNT_MISMATCH_ERROR(
+      tezosWrappedOperation.contents.length,
+      response.contents.length,
     );
   }
 

@@ -5,6 +5,7 @@ import { tezosSignPayload } from './rpc-methods/sign-payload';
 import { tezosGetRpc } from './rpc-methods/get-rpc';
 import { tezosSetRpc } from './rpc-methods/set-rpc';
 import { tezosClearRpc } from './rpc-methods/clear-rpc';
+import { METHOD_NOT_FOUND_ERROR } from './utils/errors';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 globalThis.Buffer = require('buffer/').Buffer;
@@ -55,6 +56,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return tezosClearRpc();
 
     default:
-      throw new Error('Method not found.');
+      throw METHOD_NOT_FOUND_ERROR();
   }
 };
