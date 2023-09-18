@@ -1,5 +1,6 @@
 export const USER_REJECTED_ERROR = () => new Error('User rejected');
-export const METHOD_NOT_FOUND_ERROR = () => new Error('Method not found.');
+export const METHOD_NOT_FOUND_ERROR = () => new Error('Method not found');
+export const RPC_NO_URL_ERROR = () => new Error('RPC URL not set');
 export const RPC_NO_HTTPS_ERROR = () =>
   new Error('RPC URL needs to start with https://');
 export const RPC_INVALID_URL_ERROR = () => new Error('Invalid RPC URL');
@@ -32,3 +33,4 @@ export const HEX_LENGTH_INVALID_ERROR = () =>
   new Error('Hex String has invalid length');
 export const HEX_CHARACTER_INVALID_ERROR = () =>
   new Error('Hex String has invalid character');
+export const NO_OPERATION_ERROR = () => new Error('Empty operations array');

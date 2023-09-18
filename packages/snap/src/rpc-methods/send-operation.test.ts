@@ -5,7 +5,7 @@ import chaiBytes from 'chai-bytes';
 import * as sinon from 'sinon';
 import * as getWalletMethods from '../utils/get-wallet';
 import * as getRpcMethods from '../utils/get-rpc';
-import * as prepareAndSignMethods from '../utils/prepare-and-sign';
+import * as prepareMethods from '../utils/prepare';
 import { SnapMock } from '../../test/snap.mock.test';
 import { bip32Entropy } from '../../test/constants.test';
 import { tezosSendOperation } from './send-operation';
@@ -38,7 +38,7 @@ describe('Test function: sendOperation', function () {
       );
 
     const prepareStub = sinon
-      .stub(prepareAndSignMethods, 'prepareAndSign')
+      .stub(prepareMethods, 'prepare')
       .returns(Promise.resolve('op...'));
 
     const walletMethodStub = sinon
@@ -68,7 +68,7 @@ describe('Test function: sendOperation', function () {
       );
 
     const prepareStub = sinon
-      .stub(prepareAndSignMethods, 'prepareAndSign')
+      .stub(prepareMethods, 'prepare')
       .returns(Promise.resolve('op...'));
 
     const walletMethodStub = sinon

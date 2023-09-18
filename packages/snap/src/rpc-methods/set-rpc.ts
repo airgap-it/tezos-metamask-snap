@@ -5,11 +5,16 @@ import {
   RPC_INVALID_URL_ERROR,
   RPC_INVALID_RESPONSE_ERROR,
   USER_REJECTED_ERROR,
+  RPC_NO_URL_ERROR,
 } from '../utils/errors';
 import { createOriginElement } from '../ui/origin-element';
 
 export const tezosSetRpc = async (origin: string, params: any) => {
   const { network, nodeUrl }: { network: string; nodeUrl: string } = params;
+
+  if (!nodeUrl) {
+    throw RPC_NO_URL_ERROR();
+  }
 
   if (!nodeUrl.startsWith('https://')) {
     throw RPC_NO_HTTPS_ERROR();
