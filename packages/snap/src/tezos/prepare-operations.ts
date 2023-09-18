@@ -14,6 +14,7 @@ import {
   TezosDelegationOperation,
   TezosOriginationOperation,
   TezosOperation,
+  TezosWrappedOperation,
 } from './types';
 import {
   ALLOCATION_STORAGE_LIMIT,
@@ -141,7 +142,7 @@ export const prepareOperations = async (
   operationRequests: TezosOperation[],
   nodeUrl: string,
   overrideParameters = true,
-): Promise<string> => {
+): Promise<{ estimated: TezosWrappedOperation; forged: string }> => {
   let counter: BigNumber = new BigNumber(1);
   const operations: TezosOperation[] = [];
 
@@ -267,5 +268,5 @@ export const prepareOperations = async (
     overrideParameters,
   );
 
-  return await localForger.forge(estimated as any);
+  return { estimated, forged: await localForger.forge(estimated as any) };
 };

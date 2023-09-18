@@ -7,7 +7,7 @@ import { bip32Entropy } from '../../test/constants.test';
 import { DEFAULT_NODE_URL } from '../constants';
 import * as prepareOperationMethods from '../tezos/prepare-operations';
 import * as injectTransactionMethods from '../tezos/inject-transaction';
-import { prepareAndSign } from './prepare-and-sign';
+import { prepare } from './prepare';
 
 chai.use(chaiBytes);
 chai.use(sinonChai);
@@ -26,11 +26,7 @@ describe('Test function: prepareAndSign', function () {
       .stub(injectTransactionMethods, 'injectTransaction')
       .returns(Promise.resolve('op...'));
 
-    const hash = await prepareAndSign(
-      [],
-      { ed25519: bip32Entropy },
-      DEFAULT_NODE_URL,
-    );
+    const hash = await prepare([], { ed25519: bip32Entropy }, DEFAULT_NODE_URL);
 
     expect(hash).to.equal('op...');
 
