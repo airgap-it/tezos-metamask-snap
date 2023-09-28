@@ -1,16 +1,29 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getSigner } from '../utils/get-signer';
 import { getWallet } from '../utils/get-wallet';
-import { USER_REJECTED_ERROR } from '../utils/errors';
+import { METAMASK_UI_BUSY_ERROR, USER_REJECTED_ERROR } from '../utils/errors';
+import { confirmationWrapper } from '../utils/confirmation-wrapper';
+import { ReturnWrapper } from '../types';
+import { isUiBusy } from '../utils/ui-busy';
 
-export const tezosGetAccount = async (origin: string) => {
+export const tezosGetAccount = async (
+  origin: string,
+): ReturnWrapper<{
+  curve: string;
+  publicKey: string;
+  address: string;
+}> => {
+  if (isUiBusy()) {
+    return { error: METAMASK_UI_BUSY_ERROR() };
+  }
+
   const wallet = await getWallet();
   const signer = await getSigner(wallet);
 
   const publicKey = await signer.publicKey();
   const address = await signer.publicKeyHash();
 
-  const approved = await snap.request({
+  const approved = await confirmationWrapper({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
@@ -27,12 +40,14 @@ export const tezosGetAccount = async (origin: string) => {
   });
 
   if (!approved) {
-    throw USER_REJECTED_ERROR();
+    return { error: USER_REJECTED_ERROR() };
   }
 
   return {
-    curve: 'ed25519',
-    publicKey,
-    address,
+    result: {
+      curve: 'ed25519',
+      publicKey,
+      address,
+    },
   };
 };

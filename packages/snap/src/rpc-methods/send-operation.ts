@@ -3,26 +3,34 @@ import BigNumber from 'bignumber.js';
 import { getWallet } from '../utils/get-wallet';
 import { prepare } from '../utils/prepare';
 import { getRpc } from '../utils/get-rpc';
-import { to } from '../utils/to';
-import { NO_OPERATION_ERROR, USER_REJECTED_ERROR } from '../utils/errors';
-import { TezosTransactionOperation } from '../tezos/types';
+import {
+  METAMASK_UI_BUSY_ERROR,
+  NO_OPERATION_ERROR,
+  USER_REJECTED_ERROR,
+} from '../utils/errors';
+import { TezosOperation, TezosTransactionOperation } from '../tezos/types';
 import { createOriginElement } from '../ui/origin-element';
 import { sign } from '../utils/sign';
 import { injectTransaction } from '../tezos/inject-transaction';
+import { confirmationWrapper } from '../utils/confirmation-wrapper';
+import { aggregate } from '../utils/aggregate';
+import { isUiBusy } from '../utils/ui-busy';
+import { ReturnWrapper } from '../types';
 
 const mutezToTez = (mutez: string): string => {
   return BigNumber(mutez).shiftedBy(-6).toString(10);
 };
 
-const aggregate = (array: any[], field: string) => {
-  return array
-    .reduce((pv, cv): BigNumber => {
-      return pv.plus(cv[field]);
-    }, new BigNumber(0))
-    .toString();
-};
+export const tezosSendOperation = async (
+  origin: string,
+  params: { payload: TezosOperation[] },
+): ReturnWrapper<{
+  opHash: string;
+}> => {
+  if (isUiBusy()) {
+    return { error: METAMASK_UI_BUSY_ERROR() };
+  }
 
-export const tezosSendOperation = async (origin: string, params: any) => {
   const { payload } = params;
   const wallet = await getWallet();
   const rpc = await getRpc();
@@ -32,7 +40,7 @@ export const tezosSendOperation = async (origin: string, params: any) => {
     .contents as any;
 
   if (typedPayload.length === 0) {
-    throw NO_OPERATION_ERROR();
+    return { error: NO_OPERATION_ERROR() };
   }
 
   const humanReadable = [];
@@ -88,32 +96,26 @@ export const tezosSendOperation = async (origin: string, params: any) => {
     );
   }
 
-  const [approveError, approved] = await to<string | boolean | null>(
-    snap.request({
-      method: 'snap_dialog',
-      params: {
-        type: 'confirmation',
-        content: panel([
-          heading('Sign Operation'),
-          text('Do you want to sign the following payload?'),
-          ...humanReadable,
-          copyable(JSON.stringify(payload, null, 2)),
-          divider(),
-          text(`The operation will be submit to the following node:`),
-          copyable(rpc.nodeUrl),
-          divider(),
-          ...createOriginElement(origin),
-        ]),
-      },
-    }),
-  );
-
-  if (approveError) {
-    throw new Error(`APPROVE ERROR ${approveError.message}`);
-  }
+  const approved = await confirmationWrapper({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([
+        heading('Sign Operation'),
+        text('Do you want to sign the following payload?'),
+        ...humanReadable,
+        copyable(JSON.stringify(payload, null, 2)),
+        divider(),
+        text(`The operation will be submit to the following node:`),
+        copyable(rpc.nodeUrl),
+        divider(),
+        ...createOriginElement(origin),
+      ]),
+    },
+  });
 
   if (!approved) {
-    throw USER_REJECTED_ERROR();
+    return { error: USER_REJECTED_ERROR() };
   }
 
   const operationWatermark = new Uint8Array([3]);
@@ -128,5 +130,5 @@ export const tezosSendOperation = async (origin: string, params: any) => {
     rpc.nodeUrl,
   );
 
-  return { opHash };
+  return { result: { opHash } };
 };
