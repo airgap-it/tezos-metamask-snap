@@ -6,6 +6,7 @@ import { tezosGetRpc } from './rpc-methods/get-rpc';
 import { tezosSetRpc } from './rpc-methods/set-rpc';
 import { tezosClearRpc } from './rpc-methods/clear-rpc';
 import { METHOD_NOT_FOUND_ERROR } from './utils/errors';
+import { ReturnWrapper } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 globalThis.Buffer = require('buffer/').Buffer;
@@ -32,7 +33,7 @@ type TezosSnapRpcMethods =
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
-}) => {
+}): ReturnWrapper<any> => {
   const { method, params } = request;
   const typedMethod = method as TezosSnapRpcMethods;
 
@@ -41,16 +42,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return tezosGetAccount(origin);
 
     case 'tezos_sendOperation':
-      return tezosSendOperation(origin, params);
+      return tezosSendOperation(origin, params as any);
 
     case 'tezos_signPayload':
-      return tezosSignPayload(origin, params);
+      return tezosSignPayload(origin, params as any);
 
     case 'tezos_getRpc':
       return tezosGetRpc(origin);
 
     case 'tezos_setRpc':
-      return tezosSetRpc(origin, params);
+      return tezosSetRpc(origin, params as any);
 
     case 'tezos_clearRpc':
       return tezosClearRpc(origin);

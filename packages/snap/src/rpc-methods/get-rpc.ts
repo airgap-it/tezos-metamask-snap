@@ -1,12 +1,24 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getRpc } from '../utils/get-rpc';
-import { USER_REJECTED_ERROR } from '../utils/errors';
+import { METAMASK_UI_BUSY_ERROR, USER_REJECTED_ERROR } from '../utils/errors';
 import { createOriginElement } from '../ui/origin-element';
+import { confirmationWrapper } from '../utils/confirmation-wrapper';
+import { isUiBusy } from '../utils/ui-busy';
+import { ReturnWrapper } from '../types';
 
-export const tezosGetRpc = async (origin: string) => {
+export const tezosGetRpc = async (
+  origin: string,
+): ReturnWrapper<{
+  network: string;
+  nodeUrl: string;
+}> => {
+  if (isUiBusy()) {
+    return { error: METAMASK_UI_BUSY_ERROR() };
+  }
+
   const rpc = await getRpc();
 
-  const approved = await snap.request({
+  const approved = await confirmationWrapper({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
@@ -25,11 +37,13 @@ export const tezosGetRpc = async (origin: string) => {
   });
 
   if (!approved) {
-    throw USER_REJECTED_ERROR();
+    return { error: USER_REJECTED_ERROR() };
   }
 
   return {
-    network: rpc.network,
-    nodeUrl: rpc.nodeUrl,
+    result: {
+      network: rpc.network,
+      nodeUrl: rpc.nodeUrl,
+    },
   };
 };

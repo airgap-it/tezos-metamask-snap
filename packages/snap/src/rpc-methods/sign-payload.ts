@@ -1,14 +1,31 @@
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { getWallet } from '../utils/get-wallet';
 import { sign } from '../utils/sign';
-import { USER_REJECTED_ERROR } from '../utils/errors';
+import { METAMASK_UI_BUSY_ERROR, USER_REJECTED_ERROR } from '../utils/errors';
 import { createOriginElement } from '../ui/origin-element';
+import { confirmationWrapper } from '../utils/confirmation-wrapper';
+import { isUiBusy } from '../utils/ui-busy';
+import { ReturnWrapper } from '../types';
 
-export const tezosSignPayload = async (origin: string, params: any) => {
+export const tezosSignPayload = async (
+  origin: string,
+  params: { payload: string },
+): ReturnWrapper<{
+  signature: {
+    bytes: string;
+    sig: string;
+    prefixSig: string;
+    sbytes: string;
+  };
+}> => {
+  if (isUiBusy()) {
+    return { error: METAMASK_UI_BUSY_ERROR() };
+  }
+
   const { payload } = params;
   const wallet = await getWallet();
 
-  const approved = await snap.request({
+  const approved = await confirmationWrapper({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
@@ -23,8 +40,8 @@ export const tezosSignPayload = async (origin: string, params: any) => {
   });
 
   if (!approved) {
-    throw USER_REJECTED_ERROR();
+    return { error: USER_REJECTED_ERROR() };
   }
 
-  return sign(payload, undefined, wallet);
+  return { result: await sign(payload, undefined, wallet) };
 };

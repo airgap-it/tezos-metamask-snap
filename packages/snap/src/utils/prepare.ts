@@ -1,8 +1,9 @@
 import { prepareOperations } from '../tezos/prepare-operations';
+import { TezosOperation } from '../tezos/types';
 import { getSigner } from './get-signer';
 
 export const prepare = async (
-  operations: any[],
+  operations: TezosOperation[],
   node: { ed25519: any },
   nodeUrl: string,
 ) => {

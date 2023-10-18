@@ -1,23 +1,36 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
-import { SnapStorage } from '../types';
+import { ReturnWrapper, SnapStorage } from '../types';
 import {
   RPC_NO_HTTPS_ERROR,
   RPC_INVALID_URL_ERROR,
   RPC_INVALID_RESPONSE_ERROR,
   USER_REJECTED_ERROR,
   RPC_NO_URL_ERROR,
+  METAMASK_UI_BUSY_ERROR,
 } from '../utils/errors';
 import { createOriginElement } from '../ui/origin-element';
+import { confirmationWrapper } from '../utils/confirmation-wrapper';
+import { isUiBusy } from '../utils/ui-busy';
 
-export const tezosSetRpc = async (origin: string, params: any) => {
+export const tezosSetRpc = async (
+  origin: string,
+  params: { network: string; nodeUrl: string },
+): ReturnWrapper<{
+  network: string;
+  nodeUrl: string;
+}> => {
+  if (isUiBusy()) {
+    return { error: METAMASK_UI_BUSY_ERROR() };
+  }
+
   const { network, nodeUrl }: { network: string; nodeUrl: string } = params;
 
   if (!nodeUrl) {
-    throw RPC_NO_URL_ERROR();
+    return { error: RPC_NO_URL_ERROR() };
   }
 
   if (!nodeUrl.startsWith('https://')) {
-    throw RPC_NO_HTTPS_ERROR();
+    return { error: RPC_NO_HTTPS_ERROR() };
   }
 
   const normalisedNodeUrl = `${nodeUrl}${nodeUrl.endsWith('/') ? '' : '/'}`;
@@ -27,14 +40,15 @@ export const tezosSetRpc = async (origin: string, params: any) => {
   )
     .then((res) => res.json())
     .catch(() => {
-      throw RPC_INVALID_URL_ERROR();
+      // TODO: Check return
+      return { error: RPC_INVALID_URL_ERROR() };
     });
 
   if (!header.hash || !header.chain_id) {
-    throw RPC_INVALID_RESPONSE_ERROR();
+    return { error: RPC_INVALID_RESPONSE_ERROR() };
   }
 
-  const approved = await snap.request({
+  const approved = await confirmationWrapper({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
@@ -51,7 +65,7 @@ export const tezosSetRpc = async (origin: string, params: any) => {
   });
 
   if (!approved) {
-    throw USER_REJECTED_ERROR();
+    return { error: USER_REJECTED_ERROR() };
   }
 
   const newState: SnapStorage = {
@@ -67,7 +81,9 @@ export const tezosSetRpc = async (origin: string, params: any) => {
   });
 
   return {
-    network,
-    nodeUrl,
+    result: {
+      network,
+      nodeUrl,
+    },
   };
 };

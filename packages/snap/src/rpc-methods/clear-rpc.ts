@@ -1,10 +1,22 @@
 import { panel, heading, text, divider } from '@metamask/snaps-ui';
 import { DEFAULT_NODE_URL } from '../constants';
-import { USER_REJECTED_ERROR } from '../utils/errors';
+import { METAMASK_UI_BUSY_ERROR, USER_REJECTED_ERROR } from '../utils/errors';
 import { createOriginElement } from '../ui/origin-element';
+import { confirmationWrapper } from '../utils/confirmation-wrapper';
+import { isUiBusy } from '../utils/ui-busy';
+import { ReturnWrapper } from '../types';
 
-export const tezosClearRpc = async (origin: string) => {
-  const approved = await snap.request({
+export const tezosClearRpc = async (
+  origin: string,
+): ReturnWrapper<{
+  network: string;
+  nodeUrl: string;
+}> => {
+  if (isUiBusy()) {
+    return { error: METAMASK_UI_BUSY_ERROR() };
+  }
+
+  const approved = await confirmationWrapper({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
@@ -31,7 +43,9 @@ export const tezosClearRpc = async (origin: string) => {
   });
 
   return {
-    network: 'mainnet',
-    nodeUrl: DEFAULT_NODE_URL,
+    result: {
+      network: 'mainnet',
+      nodeUrl: DEFAULT_NODE_URL,
+    },
   };
 };
