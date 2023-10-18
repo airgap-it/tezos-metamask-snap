@@ -103,7 +103,10 @@ describe('Test function: onRpcRequest', function () {
     );
 
     expect(response).to.deep.equal(returnValue);
-    expect(sendOperationStub).to.have.been.calledWithExactly(exampleParams);
+    expect(sendOperationStub).to.have.been.calledWithExactly(
+      ORIGIN,
+      exampleParams,
+    );
 
     expect(getAccountStub.callCount).to.equal(0, 'getAccountStub');
     expect(sendOperationStub.callCount).to.equal(1, 'sendOperationsStub');
@@ -133,7 +136,10 @@ describe('Test function: onRpcRequest', function () {
     );
 
     expect(response).to.deep.equal(returnValue);
-    expect(signPayloadStub).to.have.been.calledWithExactly(exampleParams);
+    expect(signPayloadStub).to.have.been.calledWithExactly(
+      ORIGIN,
+      exampleParams,
+    );
 
     expect(getAccountStub.callCount).to.equal(0, 'getAccountStub');
     expect(sendOperationStub.callCount).to.equal(0, 'sendOperationsStub');
@@ -159,7 +165,7 @@ describe('Test function: onRpcRequest', function () {
     );
 
     expect(response).to.deep.equal(returnValue);
-    expect(getRpcStub).to.have.been.calledWithExactly();
+    expect(getRpcStub).to.have.been.calledWithExactly(ORIGIN);
 
     expect(getAccountStub.callCount).to.equal(0, 'getAccountStub');
     expect(sendOperationStub.callCount).to.equal(0, 'sendOperationsStub');
@@ -185,7 +191,7 @@ describe('Test function: onRpcRequest', function () {
     );
 
     expect(response).to.deep.equal(returnValue);
-    expect(setRpcStub).to.have.been.calledWithExactly(exampleParams);
+    expect(setRpcStub).to.have.been.calledWithExactly(ORIGIN, exampleParams);
 
     expect(getAccountStub.callCount).to.equal(0, 'getAccountStub');
     expect(sendOperationStub.callCount).to.equal(0, 'sendOperationsStub');
@@ -211,7 +217,7 @@ describe('Test function: onRpcRequest', function () {
     );
 
     expect(response).to.deep.equal(returnValue);
-    expect(clearRpcStub).to.have.been.calledWithExactly();
+    expect(clearRpcStub).to.have.been.calledWithExactly(ORIGIN);
 
     expect(getAccountStub.callCount).to.equal(0, 'getAccountStub');
     expect(sendOperationStub.callCount).to.equal(0, 'sendOperationsStub');

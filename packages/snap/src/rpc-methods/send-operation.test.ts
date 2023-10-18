@@ -47,7 +47,9 @@ describe('Test function: sendOperation', function () {
 
     snapStub.rpcStubs.snap_dialog.resolves(true);
 
-    const response = await tezosSendOperation({ payload: { test: 123 } });
+    const response = await tezosSendOperation('http://localhost:1234', {
+      payload: { test: 123 },
+    });
 
     expect(response.opHash).to.equal(data.opHash);
     expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(1);
@@ -74,7 +76,7 @@ describe('Test function: sendOperation', function () {
       .returns(Promise.resolve({ ed25519: bip32Entropy } as any));
 
     await expect(
-      tezosSendOperation({ payload: { test: 123 } }),
+      tezosSendOperation('http://localhost:1234', { payload: { test: 123 } }),
     ).to.be.rejectedWith('User rejected');
     expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(1);
     expect(walletMethodStub.callCount).to.be.equal(1);

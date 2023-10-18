@@ -6,8 +6,9 @@ import {
   RPC_INVALID_RESPONSE_ERROR,
   USER_REJECTED_ERROR,
 } from '../utils/errors';
+import { createOriginElement } from '../ui/origin-element';
 
-export const tezosSetRpc = async (params: any) => {
+export const tezosSetRpc = async (origin: string, params: any) => {
   const { network, nodeUrl }: { network: string; nodeUrl: string } = params;
 
   if (!nodeUrl.startsWith('https://')) {
@@ -38,6 +39,8 @@ export const tezosSetRpc = async (params: any) => {
         divider(),
         text(`${network}`),
         copyable(nodeUrl),
+        divider(),
+        ...createOriginElement(origin),
       ]),
     },
   });

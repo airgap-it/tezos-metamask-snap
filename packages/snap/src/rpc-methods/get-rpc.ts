@@ -1,8 +1,9 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
 import { getRpc } from '../utils/get-rpc';
 import { USER_REJECTED_ERROR } from '../utils/errors';
+import { createOriginElement } from '../ui/origin-element';
 
-export const tezosGetRpc = async () => {
+export const tezosGetRpc = async (origin: string) => {
   const rpc = await getRpc();
 
   const approved = await snap.request({
@@ -17,6 +18,8 @@ export const tezosGetRpc = async () => {
         divider(),
         text(rpc.network),
         copyable(rpc.nodeUrl),
+        divider(),
+        ...createOriginElement(origin),
       ]),
     },
   });

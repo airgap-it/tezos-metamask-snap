@@ -56,7 +56,7 @@ describe('Test function: setRpc', function () {
     const data = { network: 'mainnet', nodeUrl: 'https://test.com/' };
     const { fetchStub } = setupStubs(snapStub);
 
-    const response = await tezosSetRpc(data);
+    const response = await tezosSetRpc('http://localhost:1234', data);
 
     checkStubs(response, data, fetchStub, snapStub);
 
@@ -74,7 +74,7 @@ describe('Test function: setRpc', function () {
     const data = { network: 'mainnet', nodeUrl: 'https://test.com' };
     const { fetchStub } = setupStubs(snapStub);
 
-    const response = await tezosSetRpc(data);
+    const response = await tezosSetRpc('http://localhost:1234', data);
 
     checkStubs(response, data, fetchStub, snapStub);
 
@@ -96,7 +96,7 @@ describe('Test function: setRpc', function () {
       .stub(global, 'fetch')
       .returns(jsonOk({ hash: 'op...', chain_id: 'testchain' }));
 
-    await expect(tezosSetRpc(data)).to.be.rejectedWith(
+    await expect(tezosSetRpc('http://localhost:1234', data)).to.be.rejectedWith(
       'RPC URL needs to start with https://',
     );
 
@@ -114,7 +114,9 @@ describe('Test function: setRpc', function () {
       .stub(global, 'fetch')
       .returns(jsonOk({ hash: 'op...', chain_id: 'testchain' }));
 
-    expect(tezosSetRpc(data)).to.be.rejectedWith('User rejected');
+    expect(tezosSetRpc('http://localhost:1234', data)).to.be.rejectedWith(
+      'User rejected',
+    );
 
     expect(fetchStub.callCount).to.be.equal(1, 'fetchStub');
     expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(0);
@@ -130,7 +132,9 @@ describe('Test function: setRpc', function () {
       .stub(global, 'fetch')
       .returns(jsonOk({ test: '123' }));
 
-    expect(tezosSetRpc(data)).to.be.rejectedWith('Invalid RPC URL');
+    expect(tezosSetRpc('http://localhost:1234', data)).to.be.rejectedWith(
+      'Invalid RPC URL',
+    );
 
     expect(fetchStub.callCount).to.be.equal(1, 'fetchStub');
     expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(0);
@@ -146,7 +150,9 @@ describe('Test function: setRpc', function () {
       .stub(global, 'fetch')
       .rejects(new Error('Invalid RPC URL'));
 
-    expect(tezosSetRpc(data)).to.be.rejectedWith('Invalid RPC URL');
+    expect(tezosSetRpc('http://localhost:1234', data)).to.be.rejectedWith(
+      'Invalid RPC URL',
+    );
 
     expect(fetchStub.callCount).to.be.equal(1, 'fetchStub');
     expect(snapStub.rpcStubs.snap_dialog.callCount).to.be.equal(0);

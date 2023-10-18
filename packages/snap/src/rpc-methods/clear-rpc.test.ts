@@ -28,7 +28,7 @@ describe('Test function: clearRpc', function () {
     snapStub.rpcStubs.snap_dialog.resolves(true);
     snapStub.rpcStubs.snap_manageState.resolves();
 
-    const response = await tezosClearRpc();
+    const response = await tezosClearRpc('http://localhost:1234');
 
     expect(response.network).to.equal(data.network);
     expect(response.nodeUrl).to.equal(data.nodeUrl);
@@ -41,6 +41,8 @@ describe('Test function: clearRpc', function () {
   it('should not clear the RPC if the user rejects the dialog', async function () {
     snapStub.rpcStubs.snap_dialog.resolves(false);
 
-    await expect(tezosClearRpc()).to.be.rejectedWith('User rejected');
+    await expect(tezosClearRpc('http://localhost:1234')).to.be.rejectedWith(
+      'User rejected',
+    );
   });
 });
