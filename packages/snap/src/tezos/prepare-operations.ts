@@ -13,8 +13,8 @@ import {
   ALLOCATION_STORAGE_LIMIT,
   DEFAULT_GAS_LIMIT,
   FEE_PLACEHOLDER,
-  GAS_LIMIT_PLACEHOLDER,
-  STORAGE_LIMIT_PLACEHOLDER,
+  GAS_LIMIT_PER_OPERATION,
+  STORAGE_LIMIT_PER_OPERATION,
 } from './constants';
 import { estimateAndReplaceLimitsAndFee } from './estimate-fee';
 import { getBalanceOfAddress } from './get-balance-of-address';
@@ -92,10 +92,10 @@ export const handleTransactionOperation = async (
   transactionOperation.counter = transactionOperation.counter ?? defaultCounter;
   transactionOperation.fee = transactionOperation.fee ?? defaultFee;
   transactionOperation.gas_limit =
-    transactionOperation.gas_limit ?? GAS_LIMIT_PLACEHOLDER;
+    transactionOperation.gas_limit ?? GAS_LIMIT_PER_OPERATION;
 
   transactionOperation.storage_limit =
-    transactionOperation.storage_limit ?? STORAGE_LIMIT_PLACEHOLDER;
+    transactionOperation.storage_limit ?? STORAGE_LIMIT_PER_OPERATION;
 
   return transactionOperation;
 };
@@ -121,10 +121,10 @@ export const handleOriginationOperation = async (
   originationOperation.counter = originationOperation.counter ?? defaultCounter;
   originationOperation.fee = originationOperation.fee ?? defaultFee;
   originationOperation.gas_limit =
-    originationOperation.gas_limit ?? GAS_LIMIT_PLACEHOLDER;
+    originationOperation.gas_limit ?? GAS_LIMIT_PER_OPERATION;
 
   originationOperation.storage_limit =
-    originationOperation.storage_limit ?? STORAGE_LIMIT_PLACEHOLDER;
+    originationOperation.storage_limit ?? STORAGE_LIMIT_PER_OPERATION;
 
   return originationOperation;
 };
