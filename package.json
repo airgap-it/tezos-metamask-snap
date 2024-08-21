@@ -1,6 +1,7 @@
 {
   "name": "tezos-wallet",
   "version": "0.1.0",
+  "private": "true",
   "description": "",
   "homepage": "https://github.com/airgap-it/tezos-metamask-snap#readme",
   "bugs": {
