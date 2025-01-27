@@ -1,6 +1,6 @@
 {
   "name": "tezos-metamask-snap",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tezos Wallet for MetaMask",
   "repository": {
     "type": "git",
