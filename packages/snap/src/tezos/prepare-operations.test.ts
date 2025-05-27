@@ -76,19 +76,19 @@ const assertPrepareOperationResponse = ({
 
   expect(fetchCounterStub.callCount).to.equal(1);
   expect(fetchCounterStub.firstCall.args[0]).to.deep.equal(
-    'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/counter',
+    'https://blockchain-nodes.papers.tech/tezos/metamask/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/counter',
     'fetchCounterStub',
   );
 
   expect(fetchHeadStub.callCount).to.equal(1);
   expect(fetchHeadStub.firstCall.args[0]).to.deep.equal(
-    'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head~2/hash',
+    'https://blockchain-nodes.papers.tech/tezos/metamask/chains/main/blocks/head~2/hash',
     'fetchHeadStub',
   );
 
   expect(fetchManagerStub.callCount).to.equal(1);
   expect(fetchManagerStub.firstCall.args[0]).to.deep.equal(
-    'https://tezos-node.prod.gke.papers.tech/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
+    'https://blockchain-nodes.papers.tech/tezos/metamask/chains/main/blocks/head/context/contracts/tz1UNer1ijeE9ndjzSszRduR3CzX49hoBUB3/manager_key',
     'fetchManagerStub',
   );
 
