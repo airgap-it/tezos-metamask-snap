@@ -45,7 +45,7 @@ describe('Test function: prepareAndSign', function () {
     );
     expect(prepareOperationStub.firstCall.args[2]).to.deep.equal([]);
     expect(prepareOperationStub.firstCall.args[3]).to.deep.equal(
-      'https://tezos-node.prod.gke.papers.tech/',
+      'https://blockchain-nodes.papers.tech/tezos/metamask/',
     );
 
     expect(injectTransactionStub.firstCall.args[0]).to.deep.equal(
@@ -53,7 +53,7 @@ describe('Test function: prepareAndSign', function () {
     );
 
     expect(injectTransactionStub.firstCall.args[1]).to.deep.equal(
-      'https://tezos-node.prod.gke.papers.tech/',
+      'https://blockchain-nodes.papers.tech/tezos/metamask/',
     );
   });
 });
