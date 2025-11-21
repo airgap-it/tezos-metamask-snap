@@ -31,8 +31,6 @@ describe('Test function: getSigner', function () {
   it('should fail if invalid sk is provided', async function () {
     await expect(
       getSigner({ ed25519: { privateKey: '0123456789' } }),
-    ).to.be.rejectedWith(
-      'The key FJ37EiLZZDBcHpvq is invalid. Unsupported key type',
-    );
+    ).to.be.rejectedWith('Invalid private key');
   });
 });
