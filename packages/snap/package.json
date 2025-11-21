@@ -1,6 +1,6 @@
 {
   "name": "tezos-metamask-snap",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Tezos Wallet for MetaMask",
   "repository": {
     "type": "git",
@@ -29,9 +29,9 @@
     "test:unit": "nyc --check-coverage --statements 90 --branches 70 --functions 90 --lines 90 mocha --colors -r ts-node/register -r jsdom-global/register \"**/*.test.ts\""
   },
   "dependencies": {
-    "@taquito/local-forging": "^15.1.0",
-    "@taquito/signer": "^15.1.0",
-    "bignumber.js": "^9.1.1",
+    "@taquito/local-forging": "^23.0.3",
+    "@taquito/signer": "^23.0.3",
+    "bignumber.js": "^9.3.1",
     "bs58check": "^2.1.2",
     "buffer": "^6.0.3"
   },
