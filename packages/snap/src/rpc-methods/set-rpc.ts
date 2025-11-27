@@ -1,8 +1,8 @@
 import { panel, heading, text, copyable, divider } from '@metamask/snaps-ui';
-import { SnapStorage } from '../types';
+import { Network, SnapStorage } from '../types';
 
 export const tezosSetRpc = async (params: any) => {
-  const { network, nodeUrl }: { network: string; nodeUrl: string } = params;
+  const { network, nodeUrl }: { network: Network; nodeUrl: string } = params;
 
   if (!nodeUrl.startsWith('https://')) {
     throw new Error('RPC URL needs to start with https://');

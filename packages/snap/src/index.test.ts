@@ -143,10 +143,10 @@ describe('Test function: onRpcRequest', function () {
     expect(clearRpcStub.callCount).to.equal(0, 'clearRpcStub');
   });
 
-  it('should handle tezosGetRpc request', async function () {
+  it('should handle tezosGetRpc request for mainnet', async function () {
     const returnValue = {
-      network: 'mainnet',
-      nodeUrl: 'https://test.com',
+      network: 'mainnet' as const,
+      nodeUrl: 'https://mainnet.tezos.com',
     };
 
     getRpcStub.restore();
@@ -169,9 +169,66 @@ describe('Test function: onRpcRequest', function () {
     expect(clearRpcStub.callCount).to.equal(0, 'clearRpcStub');
   });
 
+  it('should handle tezosGetRpc request for ghostnet', async function () {
+    const returnValue = {
+      network: 'ghostnet' as const,
+      nodeUrl: 'https://ghostnet.tezos.com',
+    };
+
+    getRpcStub.restore();
+    getRpcStub = sinon
+      .stub(getRpcMethods, 'tezosGetRpc')
+      .returns(Promise.resolve(returnValue));
+
+    const response = await onRpcRequest(
+      getRpcRequestWrapper('tezos_getRpc', exampleParams),
+    );
+
+    expect(response).to.deep.equal(returnValue);
+    expect(getRpcStub.callCount).to.equal(1, 'getRpcStub');
+  });
+
+  it('should handle tezosGetRpc request for shadownet', async function () {
+    const returnValue = {
+      network: 'shadownet' as const,
+      nodeUrl: 'https://shadownet.tezos.com',
+    };
+
+    getRpcStub.restore();
+    getRpcStub = sinon
+      .stub(getRpcMethods, 'tezosGetRpc')
+      .returns(Promise.resolve(returnValue));
+
+    const response = await onRpcRequest(
+      getRpcRequestWrapper('tezos_getRpc', exampleParams),
+    );
+
+    expect(response).to.deep.equal(returnValue);
+    expect(getRpcStub.callCount).to.equal(1, 'getRpcStub');
+  });
+
+  it('should handle tezosGetRpc request for custom network', async function () {
+    const returnValue = {
+      network: 'custom' as const,
+      nodeUrl: 'https://custom.node.example.com',
+    };
+
+    getRpcStub.restore();
+    getRpcStub = sinon
+      .stub(getRpcMethods, 'tezosGetRpc')
+      .returns(Promise.resolve(returnValue));
+
+    const response = await onRpcRequest(
+      getRpcRequestWrapper('tezos_getRpc', exampleParams),
+    );
+
+    expect(response).to.deep.equal(returnValue);
+    expect(getRpcStub.callCount).to.equal(1, 'getRpcStub');
+  });
+
   it('should handle tezosSetRpc request', async function () {
     const returnValue = {
-      network: 'mainnet',
+      network: 'mainnet' as const,
       nodeUrl: 'https://test.com',
     };
 
