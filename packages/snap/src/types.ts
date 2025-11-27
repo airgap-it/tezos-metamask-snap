@@ -1,6 +1,8 @@
+export type Network = 'mainnet' | 'ghostnet' | 'shadownet' | 'custom';
+
 export type SnapStorage = {
   rpc: {
-    network: string;
+    network: Network;
     nodeUrl: string;
   };
 };

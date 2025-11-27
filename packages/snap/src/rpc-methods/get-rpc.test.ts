@@ -4,7 +4,6 @@ import chaiAsPromised from 'chai-as-promised';
 import chaiBytes from 'chai-bytes';
 import * as sinon from 'sinon';
 import * as getRpcMethods from '../utils/get-rpc';
-import { SnapMock } from '../../test/snap.mock.test';
 import { tezosGetRpc } from './get-rpc';
 
 chai.use(chaiBytes);
@@ -12,21 +11,16 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe('Test function: getRpc', function () {
-  const snapStub = new SnapMock();
-
-  beforeEach(function () {
-    (global as any).snap = snapStub;
-  });
-
   afterEach(function () {
     sinon.restore();
   });
 
-  it('should share the RPC if the user accepts the dialog', async function () {
-    const data = { network: 'mainnet', nodeUrl: 'https://test.com/' };
+  it('should return mainnet RPC configuration', async function () {
+    const data = {
+      network: 'mainnet' as const,
+      nodeUrl: 'https://mainnet.tezos.com/',
+    };
     sinon.stub(getRpcMethods, 'getRpc').returns(Promise.resolve(data));
-
-    snapStub.rpcStubs.snap_dialog.resolves(true);
 
     const response = await tezosGetRpc();
 
@@ -34,15 +28,42 @@ describe('Test function: getRpc', function () {
     expect(response.nodeUrl).to.equal(data.nodeUrl);
   });
 
-  it('should not share the RPC if the user rejects the dialog', async function () {
-    sinon
-      .stub(getRpcMethods, 'getRpc')
-      .returns(
-        Promise.resolve({ network: 'mainnet', nodeUrl: 'https://test.com/' }),
-      );
+  it('should return ghostnet RPC configuration', async function () {
+    const data = {
+      network: 'ghostnet' as const,
+      nodeUrl: 'https://ghostnet.tezos.com/',
+    };
+    sinon.stub(getRpcMethods, 'getRpc').returns(Promise.resolve(data));
 
-    snapStub.rpcStubs.snap_dialog.resolves(false);
+    const response = await tezosGetRpc();
 
-    await expect(tezosGetRpc()).to.be.rejectedWith('User rejected');
+    expect(response.network).to.equal(data.network);
+    expect(response.nodeUrl).to.equal(data.nodeUrl);
+  });
+
+  it('should return shadownet RPC configuration', async function () {
+    const data = {
+      network: 'shadownet' as const,
+      nodeUrl: 'https://shadownet.tezos.com/',
+    };
+    sinon.stub(getRpcMethods, 'getRpc').returns(Promise.resolve(data));
+
+    const response = await tezosGetRpc();
+
+    expect(response.network).to.equal(data.network);
+    expect(response.nodeUrl).to.equal(data.nodeUrl);
+  });
+
+  it('should return custom RPC configuration', async function () {
+    const data = {
+      network: 'custom' as const,
+      nodeUrl: 'https://custom.node.example.com/',
+    };
+    sinon.stub(getRpcMethods, 'getRpc').returns(Promise.resolve(data));
+
+    const response = await tezosGetRpc();
+
+    expect(response.network).to.equal(data.network);
+    expect(response.nodeUrl).to.equal(data.nodeUrl);
   });
 });
