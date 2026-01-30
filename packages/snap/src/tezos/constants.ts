@@ -1,6 +1,6 @@
 // See constants on https://mainnet.ecadinfra.com/chains/main/blocks/head/context/constants
 
-export const MAX_GAS_PER_BLOCK = 1386666;
+export const MAX_GAS_PER_BLOCK = 1040000;
 export const GAS_LIMIT_PER_OPERATION = '1040000';
 export const STORAGE_LIMIT_PER_OPERATION = '60000';
 export const FEE_PLACEHOLDER = '0';
